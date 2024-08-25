@@ -1,0 +1,44 @@
+2024-07-23T01:21:55.751Z error: 
+    Error Message: relation "public.accountf" does not exist
+    Method: GET
+    URL: /api/accounts
+    Query: {}
+    Body: {}
+    File: error-logger.js
+    Line: 14
+    Column: 25
+    Function: logError
+  
+2024-07-23T01:32:27.215Z error: 
+    Error Message: Assignment to constant variable.
+    Method: undefined
+    URL: undefined
+    Query: undefined
+    Body: undefined
+    File: error-logger.js
+    Line: 14
+    Column: 25
+    Function: logError
+  
+2024-07-23T01:35:23.315Z error: 
+    Error Message: Assignment to constant variable.
+    Method: undefined
+    URL: undefined
+    Query: undefined
+    Body: undefined
+    File: error-logger.js
+    Line: 14
+    Column: 25
+    Function: logError
+  
+2024-07-23T01:35:57.213Z error: 
+    Error Message: Assignment to constant variable.
+    Method: undefined
+    URL: undefined
+    Query: undefined
+    Body: undefined
+    File: error-logger.js
+    Line: 14
+    Column: 25
+    Function: logError
+  

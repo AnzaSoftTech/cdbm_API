@@ -1,0 +1,15 @@
+[
+    {
+      "id": 1,
+      "name": "Reports",
+      "icon": "bi bi-file-earmark-bar-graph",
+      "role": "broker"
+    },
+    {
+      "id": 2,
+      "name": "Uploads",
+      "icon": "bi bi-gear",
+      "role": "admin"
+    }
+  ]
+  

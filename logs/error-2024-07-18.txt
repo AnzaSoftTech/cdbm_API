@@ -1,0 +1,36 @@
+2024-07-18 23:22:37 ERROR: uncaughtException: error is not defined
+ReferenceError: error is not defined
+    at C:\xampp\htdocs\dklabs\cdbm.api\routes\user_routes.js:62:14
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2024-07-18 23:24:14 ERROR: uncaughtException: query is not defined
+ReferenceError: query is not defined
+    at C:\xampp\htdocs\dklabs\cdbm.api\routes\user_routes.js:62:31
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2024-07-18 23:25:39 ERROR: uncaughtException: sqlquery is not defined
+ReferenceError: sqlquery is not defined
+    at C:\xampp\htdocs\dklabs\cdbm.api\routes\user_routes.js:62:31
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2024-07-18 23:28:02 ERROR: uncaughtException: result is not defined
+ReferenceError: result is not defined
+    at C:\xampp\htdocs\dklabs\cdbm.api\routes\user_routes.js:62:41
+    at Layer.handle [as handle_request] (C:\xampp\htdocs\dklabs\cdbm.api\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\xampp\htdocs\dklabs\cdbm.api\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\xampp\htdocs\dklabs\cdbm.api\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\xampp\htdocs\dklabs\cdbm.api\node_modules\express\lib\router\layer.js:95:5)
+    at C:\xampp\htdocs\dklabs\cdbm.api\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\xampp\htdocs\dklabs\cdbm.api\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\xampp\htdocs\dklabs\cdbm.api\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\xampp\htdocs\dklabs\cdbm.api\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\xampp\htdocs\dklabs\cdbm.api\node_modules\express\lib\router\index.js:47:12)
+2024-07-18 23:31:04 ERROR: uncaughtException: stackTrace.parse is not a function
+TypeError: stackTrace.parse is not a function
+    at logError (C:\xampp\htdocs\dklabs\cdbm.api\logger.js:29:30)
+    at C:\xampp\htdocs\dklabs\cdbm.api\routes\user_routes.js:63:5
+    at Layer.handle [as handle_request] (C:\xampp\htdocs\dklabs\cdbm.api\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\xampp\htdocs\dklabs\cdbm.api\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\xampp\htdocs\dklabs\cdbm.api\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\xampp\htdocs\dklabs\cdbm.api\node_modules\express\lib\router\layer.js:95:5)
+    at C:\xampp\htdocs\dklabs\cdbm.api\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\xampp\htdocs\dklabs\cdbm.api\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\xampp\htdocs\dklabs\cdbm.api\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\xampp\htdocs\dklabs\cdbm.api\node_modules\express\lib\router\index.js:175:3)

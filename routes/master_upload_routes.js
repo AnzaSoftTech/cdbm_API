@@ -50,13 +50,19 @@ master_upload_router.get('/sauda_metadata', async (req, res) => {
   //var e =req.query["exch_cd"];
   //var s =req.query["segment"];
   try {
-    const query = `SELECT * FROM cdbm.file_upload_master
-      WHERE disp_ui = 'Y' AND ($1::text IS NULL OR exch_cd ='`+ req.query["exch_cd"] + `')
-      AND ($2::text IS NULL OR segment = '`+ req.query["segment"] + `')`
-    //console.log(query);
-    const values = [exch_cd, segment];
+    await pool.query(`delete from cdbm.master_file_name;`);
+    const query = `SELECT file_cd, exch_cd, segment, file_name, file_interval, file_nomenclature, expected_time, 
+	                        file_type, disp_ui, to_char(last_upld_datetime, 'DD-Mon-YYYY HH24:MI:SS') as upd_date_time,
+                          last_status        
+                     FROM cdbm.file_upload_master WHERE disp_ui = 'Y' ORDER BY file_cd `;
+      
+    //   AND ($1::text IS NULL OR exch_cd ='`+ req.query["exch_cd"] + `')
+    //   AND ($2::text IS NULL OR segment = '`+ req.query["segment"] + `')`;
+    // const values = [exch_cd, segment];
+
     //const values = [exch_cd, segment, date];
-    const result = await pool.query(query, values);
+    //const result = await pool.query(query, values);
+    const result = await pool.query(query);
     res.json(result.rows);
   } catch (err) {
     logError(err, req);
@@ -65,15 +71,26 @@ master_upload_router.get('/sauda_metadata', async (req, res) => {
   }
 });
 
-master_upload_router.post('/MasterFileupload', (req, res) => {
-  const {filecd} = req.query;
-  //console.log('filecode:'+filecd);
-  upload(req, res, (err) => {
-    if (err) {
-      return res.status(500).json({ msg: err.message });
-    }
-    res.status(200).json({ msg: 'Files Uploaded Successfully', filename: 'fname'  });
-  });
+master_upload_router.post('/MasterFileupload', async (req, res) => {
+  try {
+    const { filecd, filename } = req.query;
+    //console.log('filecd, filename', filecd, filename);
+
+    upload(req, res, (err) => {
+      if (err) {
+        return res.status(500).json({ msg: err.message });
+      }
+      res.status(200).json({ msg: 'Files Uploaded Successfully', filename: 'fname' });
+    });
+    /// Inserting selected file names into a table, to be used in database
+    await pool.query(`delete from cdbm.master_file_name where file_cd = '` + filecd + `';`);
+    await pool.query(`insert into cdbm.master_file_name (file_cd, file_name, datetime) values ('` + filecd + `', '` + filename + `', clock_timestamp());`);
+  }
+  catch (err) {
+    console.log('Error : ', err);
+    logError(err, req);
+    res.status(500).send('Server error');
+  }
 });
 
 //-----Helper function to process var files--------

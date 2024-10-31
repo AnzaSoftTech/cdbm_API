@@ -10,6 +10,7 @@ const multer = require('multer');
 const fs = require('fs');
 const fastcsv = require('fast-csv');
 const { v4: uuidv4 } = require('uuid');
+const { Console } = require('console');
 
 const sqlquery='';
 const resulterr = [];
@@ -44,18 +45,14 @@ sauda_upload_router.get('/last_upd_date_status', async (req, res) => {
     }
   });
   
-  
+  /*
   sauda_upload_router.get('/sauda_metadata', async (req, res) => {
     const { exch_cd, segment} = req.query;
-    //const { exch_cd, segment, date } = req.query;
-    //var e =req.query["exch_cd"];
-    //var s =req.query["segment"];
     try {
       const query = `SELECT * FROM cdbm.file_upload_master
         WHERE 1=1 AND ($1::text IS NULL OR exch_cd ='`+req.query["exch_cd"]+`')
         AND ($2::text IS NULL OR segment = '`+req.query["segment"]+`')`
       const values = [exch_cd, segment];
-      //const values = [exch_cd, segment, date];
       const result = await pool.query(query, values);
       res.json(result.rows);
     } catch (err) {
@@ -63,7 +60,7 @@ sauda_upload_router.get('/last_upd_date_status', async (req, res) => {
       res.status(500).send('Server error');
     }
   });
-  
+  */
   
   // *************************************************************************
   // *************************************************************************
@@ -223,7 +220,7 @@ sauda_upload_router.get('/last_upd_date_status', async (req, res) => {
         })
         .on('end', async () => {
           try {
-            //console.log(csvData[0]);
+            //console.log('before ftp insert --> ', csvData[0]);
             for (const row of csvData) {
               await pool.query(`
                 INSERT INTO cdbm.stag_cm_sb_ftp (
@@ -680,5 +677,163 @@ sauda_upload_router.get('/last_upd_date_status', async (req, res) => {
     }
   });
 
+  sauda_upload_router.get('/auctiondata', async (req, res) => {
+    try {
+      // Updated SQL query without file_cd filter
+      
+      const query = `
+        SELECT symbol, series,SUM(alloc_qty) AS total_alloc_qty,SUM(trade_qty) AS total_trade_qty
+        FROM CDBM.AUCTION_TRADE_ERROR_HANDLING 
+        GROUP BY symbol, series HAVING SUM(alloc_qty) = 0 ORDER BY symbol, series;`;
+  
+      const result = await pool.query(query);
+      res.json(result.rows);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server error');
+    }
+  });
+  /*
+   sauda_upload_router.get('/stag_auction', (req, res) => {
+    const symbol = req.query.symbol; // Example query parameter
+  
+    console.log('symbol',symbol);
+  
+    const query = `SELECT * FROM cdbm.stag_cm_sb_ftp WHERE CLIENT_ID = 'NSE' AND  symbol = ?`;
+    
+    console.log('query >>>>>> ', query);
+
+    query(query, [symbol], (error, results) => {
+        if (error) {
+            console.error('Error fetching data:', error);
+            res.status(500).send('Server Error');
+            return;
+        }
+        res.json(results);
+        console.log("result",results);
+    });
+  });
+  
+*/
+
+sauda_upload_router.get('/stag_auction', async (req, res) => {
+  const symbol = req.query.symbol;
+
+ // console.log('symbol:', symbol);
+
+  const query = `SELECT client_id, SYMBOL, security_series, unq_trade_id, ord_ref_no, trade_date, price, trade_qty, inst_type ` + 
+                ` FROM cdbm.stag_cm_sb_ftp WHERE CLIENT_ID = 'NSE' AND  symbol = $1`;
+
+  try {
+      // Perform the query
+      const result = await pool.query(query, [symbol]);
+
+      // Check if data is returned
+      if (result.rows.length > 0) {
+          res.json(result.rows);
+         // console.log('result:', result.rows);
+      } else {
+          res.status(404).send('No data found');
+      }
+  } catch (err) {
+     // console.error('Error fetching data:', err);
+      res.status(500).send('Server Error');
+  }
+});
+
+  sauda_upload_router.post('/saveAuctionDetails', async (req, res) => {
+    const { auctionDetails, clientDetails } = req.body;
+    // console.log("req.body",req.body);
+  
+    // Define a combined query to insert auction and client details
+
+    //console.log('inside saveAuctionDetails <<<<<<');
+
+    const queryInsertCombinedDetails = `
+        INSERT INTO cdbm.auction_client_details (rec_no, client_id, company, exchange, branch, unq_trade_id, ord_ref_no,
+            trade_date, price, security_series, client_code, sec, qty)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`;
+  
+    // Define a query to update auction_trade_error_handling table
+    const queryUpdateErrorHandling = `UPDATE cdbm.auction_trade_error_handling ` + 
+                                    ` SET alloc_qty = $1 ` + 
+                                     ` WHERE series = $2 AND symbol = $3 and trade_qty =$4`;
+  
+    try {
+        await pool.query('BEGIN'); // Start transaction
+
+        await pool.query(`delete from cdbm.auction_client_details;`);
+  
+        // Insert auction details for each client detail
+        for (const clientDetail of clientDetails) {
+            if (auctionDetails.length > 0) {
+                const auctionDetail = auctionDetails[0]; // Get the first (and only) auction detail
+                
+                // Insert into auction_client_details
+                await pool.query(queryInsertCombinedDetails, [
+                    auctionDetail.recNo || null,
+                    auctionDetail.client_id || null,
+                    auctionDetail.company || null,
+                    auctionDetail.exchange || null,
+                    auctionDetail.branch || null,
+                    auctionDetail.unq_trade_id || null,
+                    auctionDetail.ord_ref_no || null,
+                    auctionDetail.trade_date || null,
+                    auctionDetail.price || null,
+                    auctionDetail.security_series || null,
+                    clientDetail.clientCode || null,
+                    clientDetail.sec || null,
+                    clientDetail.qty || null
+                ]);
+                
+                // Update auction_trade_error_handling with alloc_qty
+                for (const auction of auctionDetails) {
+                  console.log('auction',auctionDetail);
+                await pool.query(queryUpdateErrorHandling, [
+                  auction.trade_qty || null,
+                  auction.security_series || null,
+                  clientDetail.sec || null,
+                  auction.trade_qty || null
+                ]);
+                
+              }
+            }
+        }
+
+        /// checking if all auction qty and trade qty are allocated against clients or not. if all allocated then run DB procedure.
+        
+      const lv_count = await pool.query( `select count(1) cnt from (
+        SELECT symbol, series,SUM(alloc_qty) AS total_alloc_qty,SUM(trade_qty) AS total_trade_qty
+                FROM CDBM.AUCTION_TRADE_ERROR_HANDLING 
+                GROUP BY symbol, series HAVING SUM(alloc_qty) = 0 ) 
+        where total_alloc_qty != total_trade_qty;`);
+     // console.log('lv_count ===>', lv_count);
+      if (lv_count.rows[0].cnt === '0')
+      {
+        const lv_status = await pool.query('CALL cdbm.usp_Auction_Qty_Alloc($1)', [0]);
+        if (lv_status.rows[0].p_status == '1')
+        {
+          res.json({message: '99' }); /// Allocation complete, upload and process the FTP file again
+        }
+        else
+        {
+          res.json({message: '95' }); /// allocation error
+        }
+      }
+      else 
+      {
+        res.json({message: '90' });
+      }
+
+      await pool.query('COMMIT'); // Commit transaction
+  
+       // res.status(200).json({ message: 'Data saved successfully' });
+    } catch (error) {
+        await pool.query('ROLLBACK'); // Rollback transaction in case of error
+        console.error('Error saving data:', error);
+        res.status(500).json({ message: 'Error saving data' });
+    }
+  });
+  
 
 module.exports = sauda_upload_router;

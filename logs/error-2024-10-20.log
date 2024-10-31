@@ -1,0 +1,11 @@
+2024-10-20T12:52:35.938Z error: 
+    Error Message: function clock_datetime() does not exist
+    Method: POST
+    URL: /api/MasterFileupload?filecd=CORP_ACT&filename=TC_03062024_1K089.txt
+    Query: {"filecd":"CORP_ACT","filename":"TC_03062024_1K089.txt"}
+    Body: {}
+    File: error-logger.js
+    Line: 14
+    Column: 25
+    Function: logError
+  

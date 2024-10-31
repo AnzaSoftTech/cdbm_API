@@ -146,6 +146,7 @@ sauda_book_router.get('/sauda_book', async (req, res) => {
     } = req.params;
     try {
         const result = await pool.query('SELECT name FROM cdbm.client_master WHERE client_cd = $1', [id]);
+        //console.log('result ==> ', result);
         if (result.rows.length > 0) {
             res.json(result.rows[0]);
         } else {

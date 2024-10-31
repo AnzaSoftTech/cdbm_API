@@ -8,6 +8,9 @@ const cash_net_routes = require('./routes/cash_net_routes');
 const ledger_routes = require('./routes/ledger_routes');
 const trial_balance_routes = require('./routes/trial_balance_routes');
 const payment_receipt_routes = require('./routes/payment_receipt_routes');
+const journal_voucher_routes = require('./routes/journal_voucher_routes');
+const dr_cr_note_routes = require('./routes/dr_cr_note_routes.js');
+const contra_voucher_routes = require('./routes/contra_voucher_routes');
 
 const cors = require('cors');
 const path = require('path');
@@ -99,6 +102,9 @@ app.use(`${baseURL}/searchclient`, sauda_book_routes);
 app.use(`${baseURL}/searchScrip`, sauda_book_routes);
 app.use(`${baseURL}/branches`, sauda_book_routes);
 app.use(`${baseURL}/settlement_type`, user_routes);
+app.use(`${baseURL}/auctiondata`, user_routes);
+app.use(`${baseURL}/stag_auction`, user_routes);
+app.use(`${baseURL}/saveAuctionDetails`, user_routes);
 
 app.use(`${baseURL}`, cash_net_routes);
 app.use(`${baseURL}/client`, cash_net_routes);
@@ -120,7 +126,7 @@ app.use(`${baseURL}/bal`, trial_balance_routes);
 
 //console.log('2 server.js *************************** baseURL', baseURL);
 app.use(`${baseURL}`, sauda_upload_routes);
-app.use(`${baseURL}/sauda_metadata`, sauda_upload_routes);
+//app.use(`${baseURL}/sauda_metadata`, sauda_upload_routes);
 //app.use(`${baseURL}/upload`, sauda_upload_routes);
 app.use(`${baseURL}/insert-var-file-stag`, sauda_upload_routes);
 app.use(`${baseURL}/insert-bhav-copy-stag`, sauda_upload_routes);
@@ -152,6 +158,33 @@ app.use(`${baseURL}/fin_company/:voucherDate`, payment_receipt_routes);
 app.use(`${baseURL}/exchange`, payment_receipt_routes);
 app.use(`${baseURL}/bill_master`, payment_receipt_routes);
 app.use(`${baseURL}/voucher`, payment_receipt_routes);
+
+app.use(`${baseURL}`, journal_voucher_routes);
+app.use(`${baseURL}/bookType`, journal_voucher_routes);
+app.use(`${baseURL}/branches`, journal_voucher_routes);
+app.use(`${baseURL}/Account`, journal_voucher_routes);
+app.use(`${baseURL}/searchVouchers`, journal_voucher_routes);
+app.use(`${baseURL}/searchEditVouchar`, journal_voucher_routes);
+app.use(`${baseURL}/fin_company/:voucherDate`, journal_voucher_routes);
+app.use(`${baseURL}/exchange`, journal_voucher_routes);
+app.use(`${baseURL}/save_journal_voucher`, journal_voucher_routes);
+
+app.use(`${baseURL}`, dr_cr_note_routes);
+app.use(`${baseURL}/branches`, dr_cr_note_routes);
+app.use(`${baseURL}/Account`, dr_cr_note_routes);
+app.use(`${baseURL}/searchAccount`, dr_cr_note_routes);
+app.use(`${baseURL}/searchVouchers`, dr_cr_note_routes);
+app.use(`${baseURL}/fin_company/:voucherDate`, dr_cr_note_routes);
+app.use(`${baseURL}/voucher`, dr_cr_note_routes);
+
+app.use(`${baseURL}`, contra_voucher_routes);
+app.use(`${baseURL}/last_upd_date_status`, contra_voucher_routes);
+app.use(`${baseURL}/cash_bank_master`, contra_voucher_routes);
+app.use(`${baseURL}/branches`, contra_voucher_routes);
+app.use(`${baseURL}/exchange`, contra_voucher_routes);
+app.use(`${baseURL}/analyzercode`, contra_voucher_routes);
+app.use(`${baseURL}/populatedetails`, contra_voucher_routes);
+app.use(`${baseURL}/save_contra_voucher`, contra_voucher_routes);
 
 
 //app.use('${baseURL}', routes);

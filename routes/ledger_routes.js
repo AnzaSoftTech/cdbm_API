@@ -24,7 +24,12 @@ port:process.env.DB_PORT
 // CRUD endpoints
 ledger_router.get('/ledger', async (req, res) => {
     try {
-      const result = await pool.query('SELECT * FROM cdbm.ledger');
+      const result = await pool.query(`select to_char (trans_date, 'DD-MM-YYYY') date, voucher_no vchr_no, fm.act_name particular,
+	   case when drcr= 'Dr' then amount else 0 end debit_amount,
+	   case when drcr= 'Cr' then amount else 0 end credit_amount,
+	   0 balance_amount
+	from cdbm.fin_transactions ft
+	join cdbm.fin_account_master fm on ft.act_cd = fm.act_cd`);
       res.json(result.rows);
     } catch (err) {
       res.status(500).send(err.message);

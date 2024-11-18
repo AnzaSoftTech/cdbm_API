@@ -120,7 +120,7 @@ app.use(`${baseURL}/bal`, trial_balance_routes);
 
 //console.log('2 server.js *************************** baseURL', baseURL);
 app.use(`${baseURL}`, sauda_upload_routes);
-app.use(`${baseURL}/sauda_metadata`, sauda_upload_routes);
+//app.use(`${baseURL}/sauda_metadata`, sauda_upload_routes);
 //app.use(`${baseURL}/upload`, sauda_upload_routes);
 app.use(`${baseURL}/insert-var-file-stag`, sauda_upload_routes);
 app.use(`${baseURL}/insert-bhav-copy-stag`, sauda_upload_routes);

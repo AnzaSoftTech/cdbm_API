@@ -420,6 +420,68 @@ const processScriptMasterFile = async (filePath) => {
   });
 };
 
+/// staging Holding data
+
+master_upload_router.post('/daily-holdings-stag', async (req, res) => {
+  try {
+    const files = fs.readdirSync(csvDirectory).filter(file => file.endsWith('.csv'));
+    await pool.query(`delete from cdbm.stage_dpm_soh`);
+    for (const file of files) {
+      if (file.startsWith('HOLDINGS')) {
+          const filePath = path.join(csvDirectory, file);
+          if (fs.existsSync(filePath)) {
+            await processHoldingFile(filePath);
+            fs.unlinkSync(filePath); // Delete the file after processing
+          } else {
+            console.warn(`File ${file} does not exist.`);
+          }
+      }
+  }
+    res.json({ message: 'Holding file processed successfully' });
+  } catch (error) {
+    console.error('Error processing Holding files:', error);
+    res.status(500).json({ message: 'Error processing Holding files' });
+  }
+});
+
+const processHoldingFile = async (filePath) => {
+  return new Promise((resolve, reject) => {
+    const stream = fs.createReadStream(filePath);
+    const csvData = [];
+    const csvStream = fastcsv
+      .parse({headers: false}) // Remove headers: false option
+      .on('data', (data) => {
+        csvData.push(data); // Push entire row of data
+      })
+      .on('end', async () => {
+        try {
+          //console.log(csvData[0]);
+          for (const row of csvData) {
+            await pool.query(`
+              INSERT INTO cdbm.stage_dpm_soh (source, dp_id, branch_code, line_no, benefic_catg, benefic_id, isin, market_type, settle_no, record_type, 
+                          curr_bal, bndcryacctpos, demat_pndg_verf_bal, demat_pndg_confrm_bal, lent_bal, brrw_bal, lock_in_bal_unr_rmat, isin_freeze_for_dr_cr, 
+                          boid_freeze_for_dr_cr, boisin_freeze_for_dr_cr, repledge_bal, cc_id, block_lock_flag, block_lock_code, lock_in_bal, lock_in_release_date, 
+                          pledge_bal, earmrk_bal, safe_keep_bal, rmtrlstn_pdg_bal, avl_for_lend_bal, cm_delivery, cm_receipt, beneficiary_hold_trnsit_bal, 
+                          beneficiary_hold_balance, cm_pool, cm_transit, transit_bal, statement_date, remarks, reserved_1, reserved_2, reserved_3, reserved_4)
+              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28,
+                      $29, $30, $31, $32, $33, $34, $35, $36, $37, $38, $39, $40, $41, $42, $43, $44); `, 
+            [row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13], row[14], row[15],
+             row[16], row[17], row[18], row[19], row[20], row[21], row[22], row[23], row[24], row[25], row[26], row[27], row[28], row[29], row[30],
+             row[31], row[32], row[33], row[34], row[35], row[36], row[37], row[38], row[39], row[40], row[41], row[42], row[43]]);
+          }
+          // temp await execProcedure();
+          resolve();
+        } catch (error) {
+          reject(error);
+        }
+      })
+      .on('error', (error) => {
+        reject(error);
+      });
+
+    stream.pipe(csvStream);
+  });
+};
 
  master_upload_router.post('/exec_db_Procedure', async (req, res) => {
   try {

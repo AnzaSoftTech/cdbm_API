@@ -1,0 +1,11 @@
+2024-11-20T16:33:59.335Z error: 
+    Error Message: column csb.trd_enter_date_time does not exist
+    Method: GET
+    URL: /api/contract_notes?p_transaction_date=03/06/2024
+    Query: {"p_transaction_date":"03/06/2024"}
+    Body: {}
+    File: error-logger.js
+    Line: 14
+    Column: 25
+    Function: logError
+  

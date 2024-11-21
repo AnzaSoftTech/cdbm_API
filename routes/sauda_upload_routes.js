@@ -357,18 +357,23 @@ sauda_upload_router.get('/last_upd_date_status', async (req, res) => {
   sauda_upload_router.post('/process-auct-price', async (req, res) => {
     try {
       const files = fs.readdirSync(auctpriceDirectory).filter(file => file.endsWith('.txt'));
+      var lv_file_path;
       for (const file of files) {
         const filePath = path.join(auctpriceDirectory, file);
-        await insert_auct_file(filePath); //process_oblig_file(filePath);
-        //await processCSVFile(filePath);
-        fs.unlinkSync(filePath);
+        //console.log('1 filepath = ', filePath);
+        lv_file_path = filePath;
+        // await insert_auct_file(filePath); 
+        // fs.unlinkSync(filePath);
       }
+      //console.log('2 lv_file_path = ', lv_file_path);
+      await insert_auct_file(lv_file_path); 
+      fs.unlinkSync(lv_file_path);
       res.json({ message: 'CSV file/s processed successfully' });
     } catch (error) {
-      fs.unlinkSync(filePath);
-      logError(error, req);
+      fs.unlinkSync(lv_file_path);
+      //logError(error, req);
       //console.error('Error processing CSV files:', error);
-      res.status(500).json({ message: 'Error processing CSV files' });
+      res.status(500).json({ message: 'Error processing CSV files ' });
     }
   });
   
@@ -408,7 +413,8 @@ sauda_upload_router.get('/last_upd_date_status', async (req, res) => {
             await insert_auct_stag();
             resolve();
           } catch (error) {
-            logError(error, req);
+            console.log('error in insert_auct_stag ', error);
+           // logError(error, req);
             reject(error);
           }
         })

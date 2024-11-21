@@ -221,7 +221,7 @@ payment_voucher_router.get('/searchVoucharById', async (req, res) => {
   let lv_dtl_query = ` SELECT ft.segment, ft.activity_cd, ft.nor_depos, ft.fin_year,  ft.nse_narr_code,` +
     `           ft.voucher_no, ft.book_type, (ft.trans_date AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata') AS trans_date,ft.amount, ft.drcr, ft.narration, ` +
     `           (ft.eff_date AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata') AS eff_date,ft.narr_code,ft.act_cd,fm.act_name,ft.d_add_date ,ft.trans_type` +
-    `   FROM cdbm.fin_transactions ft join cdbm.fin_account_master fm on fm.act_Cd = ft.act_cd  ` +
+    `   FROM cdbm.fin_transactions ft join cdbm.fin_account_master fm on fm.act_Cd = ft.act_cd and fm.nor_depos = ft.nor_depos ` +
     `        and fm.segment = ft.segment` +
     ` WHERE voucher_no = ` + voucherNo +
     ` AND fin_year = ` + fin_year +

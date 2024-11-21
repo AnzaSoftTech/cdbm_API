@@ -11,6 +11,7 @@ const payment_receipt_routes = require('./routes/payment_receipt_routes');
 const journal_voucher_routes = require('./routes/journal_voucher_routes');
 const dr_cr_note_routes = require('./routes/dr_cr_note_routes.js');
 const contra_voucher_routes = require('./routes/contra_voucher_routes');
+const sauda_report_routes = require('./routes/sauda_report_routes');
 
 const cors = require('cors');
 const path = require('path');
@@ -185,6 +186,11 @@ app.use(`${baseURL}/exchange`, contra_voucher_routes);
 app.use(`${baseURL}/analyzercode`, contra_voucher_routes);
 app.use(`${baseURL}/populatedetails`, contra_voucher_routes);
 app.use(`${baseURL}/save_contra_voucher`, contra_voucher_routes);
+
+app.use(`${baseURL}`, sauda_report_routes);
+app.use(`${baseURL}/company_details`, sauda_report_routes);
+app.use(`${baseURL}/exc_details`, sauda_report_routes);
+app.use(`${baseURL}/contract_notes`, sauda_report_routes);
 
 
 //app.use('${baseURL}', routes);

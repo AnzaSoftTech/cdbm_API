@@ -198,6 +198,7 @@ cash_net_router.get('/client_net_position', async (req, res) => {
 
     let query = `SELECT client_cd, scrip_cd,settle_tp, series,buy_qty, buy_value, sale_qty, sale_value, ` + 
                        ` (buy_qty - sale_qty) AS net_qty, (buy_value - sale_value) AS net_value, ` + 
+                       ` nse_buy_value,  nse_sale_value, total_charges, total_stt, ` +
                        ` TO_CHAR(position_date, 'DD-MM-YYYY') position_date, ` +
                        ` dsettleno as delv_settle_no from cdbm.cash_net_position_client WHERE 1=1 `;
     const values = [];
@@ -238,9 +239,6 @@ cash_net_router.get('/client_net_position', async (req, res) => {
       query += ` AND branch_cd ILIKE $${values.length}`;
     }
     
-    console.log(query);
-    console.log(values);
-
     try {
         const result = await pool.query(query, values);
         res.json(result.rows);

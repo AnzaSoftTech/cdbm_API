@@ -12,6 +12,9 @@ const journal_voucher_routes = require('./routes/journal_voucher_routes');
 const dr_cr_note_routes = require('./routes/dr_cr_note_routes.js');
 const contra_voucher_routes = require('./routes/contra_voucher_routes');
 const sauda_report_routes = require('./routes/sauda_report_routes');
+const cashbank_master_routes = require('./routes/cashbank_master_routes');
+const acct_master_routes = require('./routes/account_master_routes');
+const booktype_mast_routes = require('./routes/booktype_mast_routes');
 
 const cors = require('cors');
 const path = require('path');
@@ -192,6 +195,48 @@ app.use(`${baseURL}/company_details`, sauda_report_routes);
 app.use(`${baseURL}/exc_details`, sauda_report_routes);
 app.use(`${baseURL}/contract_notes`, sauda_report_routes);
 
+
+app.use(`${baseURL}`, cashbank_master_routes);
+app.use(`${baseURL}/ddl_segment_master`, cashbank_master_routes);
+app.use(`${baseURL}/ddl_activity_master`, cashbank_master_routes);
+app.use(`${baseURL}/ddl_fin_group_level2`, cashbank_master_routes);
+app.use(`${baseURL}/ddl_fin_group_level3`, cashbank_master_routes);
+app.use(`${baseURL}/ddl_fin_group_level4`, cashbank_master_routes);
+app.use(`${baseURL}/ddl_MI_master`, cashbank_master_routes);
+app.use(`${baseURL}/save_cash_bank_master`, cashbank_master_routes);
+app.use(`${baseURL}/search_bookType_frm_cash_bank_master`, cashbank_master_routes);
+app.use(`${baseURL}/search_BankBranches`, cashbank_master_routes);
+app.use(`${baseURL}/save_cheque_nos`, cashbank_master_routes);
+app.use(`${baseURL}/get_cheque_nos`, cashbank_master_routes);
+app.use(`${baseURL}/search_Cash_Bank_Master`, cashbank_master_routes);
+app.use(`${baseURL}/search_CashBank_Master_ById`, cashbank_master_routes);
+app.use(`${baseURL}/get_addresses`, cashbank_master_routes);
+app.use(`${baseURL}/get_cont_persons`, cashbank_master_routes);
+app.use(`${baseURL}/save_address_cont_persons`, cashbank_master_routes);
+
+app.use(`${baseURL}`, acct_master_routes);
+app.use(`${baseURL}/ddl_segment_master`, acct_master_routes);
+app.use(`${baseURL}/ddl_activity_master`, acct_master_routes);
+app.use(`${baseURL}/ddl_fin_group_level2`, acct_master_routes);
+app.use(`${baseURL}/ddl_fin_group_level3`, acct_master_routes);
+app.use(`${baseURL}/ddl_fin_group_level4`, acct_master_routes);
+app.use(`${baseURL}/ddl_MI_master`, acct_master_routes);
+app.use(`${baseURL}/save_account_master`, acct_master_routes);
+app.use(`${baseURL}/search_account_master`, acct_master_routes);
+app.use(`${baseURL}/search_Acc_Master_ById`, acct_master_routes);
+app.use(`${baseURL}/search_BankBranches`, acct_master_routes);
+app.use(`${baseURL}/save_cheque_nos`, acct_master_routes);
+app.use(`${baseURL}/save_address_cont_persons`, acct_master_routes);
+app.use(`${baseURL}/get_cont_persons`, acct_master_routes);
+app.use(`${baseURL}/client_bank_ac_type`, acct_master_routes);
+app.use(`${baseURL}/save_bank_details`, acct_master_routes);
+app.use(`${baseURL}/get_bank_details`, acct_master_routes);
+
+app.use(`${baseURL}`, booktype_mast_routes);
+app.use(`${baseURL}/ddl_segment_master`, booktype_mast_routes);
+app.use(`${baseURL}/ddl_activity_master`, booktype_mast_routes);
+app.use(`${baseURL}/save_bookType`, booktype_mast_routes);
+app.use(`${baseURL}/search_BookType`, booktype_mast_routes);
 
 //app.use('${baseURL}', routes);
 // Routes

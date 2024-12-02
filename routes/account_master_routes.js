@@ -180,7 +180,7 @@ acct_mast_router.get('/ddl_segment_master', async (req, res) => {
                               set activity_cd  = $1, exc_cd=$2, segment=$3, account_name = $4, ledg_type=$5,
                               grp_code=$6, sub_grp_code=$7, sub_sub_grp_code=$8, status=$9, pan_no=$10, crn=$11, 
                               upd_user_id=$12, upd_date = clock_timestamp()
-          where act_cd = $12;`;
+          where act_cd = $13;`;
           await pool.query(lv_upd_statement, [activityCode, exchange, segment, acctName, ledgType, 
                                               groupCode, subgroupCode, subsubgroupCode, actstatus, panNo, crn, 
                                               userId, actCode]);

@@ -25,7 +25,10 @@ port:process.env.DB_PORT
 // CRUD endpoints
 trial_balance_router.get('/bal', async (req, res) => {
     try {
-      const result = await pool.query('SELECT * FROM cdbm.bal');
+      const result = await pool.query(
+        `SELECT acct_code, acct_name  paticular, open_bal_dr, open_bal_cr, amt_dr, amt_cr, closing_dr, closing_cr ` + 
+         ` FROM cdbm.trial_balance`);
+  // "	"acct_name"	""	"open_bal_cr"	"amt_dr"	""	""	"closing_cr"
       console.log('result.rows ' , result.rows);
       res.json(result.rows);
     } catch (err) {

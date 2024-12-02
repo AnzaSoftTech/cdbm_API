@@ -96,7 +96,7 @@ payment_voucher_router.get('/branches', async (req, res) => {
 
 payment_voucher_router.get('/Account', async (req, res) => {
   try {
-    const result = await pool.query('SELECT act_cd,act_name FROM cdbm.fin_account_master order by act_name');
+    const result = await pool.query('SELECT act_cd, account_name FROM cdbm.fin_account_master order by account_name');
     res.json(result.rows);
   } catch (err) {
     res.status(500).send(err.message);
@@ -107,7 +107,7 @@ payment_voucher_router.get('/searchAccount', async (req, res) => {
   const { activity_cd, segment, name } = req.query;
   //console.log('body',req.body);
   let queryParams = [];
-  let query = 'SELECT act_cd, act_name, branch_cd, cmp_cd, type_cd FROM cdbm.fin_account_master WHERE 1=1 ';
+  let query = 'SELECT act_cd, account_name FROM cdbm.fin_account_master WHERE 1=1 ';
 
   //console.log('activity_cd, segment --> ', activity_cd, segment);
 
@@ -120,7 +120,7 @@ payment_voucher_router.get('/searchAccount', async (req, res) => {
     queryParams.push(segment);
   }
   if (name) {
-    query += ' AND act_name ILIKE $3';
+    query += ' AND account_name ILIKE $3';
     queryParams.push(`%${name}%`);
   }
   //console.log('activity_cd -> ', activity_cd);
@@ -141,14 +141,13 @@ payment_voucher_router.get('/searchVouchers', async (req, res) => {
 
   
   // let query = `SELECT ft.segment, ft.exc_cd, ft.nor_depos, ft.fin_year, ft.branch_cd, ft.cmp_cd, ` +
-  //   ` ft.voucher_no,ft.book_type, ft.trans_date, fm.act_name,fm.act_cd ,ft.amount, ft.drcr ,ft.trans_type ` +
+  //   ` ft.voucher_no,ft.book_type, ft.trans_date, fm.account_name,fm.act_cd ,ft.amount, ft.drcr ,ft.trans_type ` +
   //   ` FROM cdbm.fin_transactions ft join cdbm.fin_account_master fm on fm.act_Cd = ft.act_cd and fm.branch_cd = ft.branch_cd  and ft.trans_type=ft.trans_type WHERE 1=1`;
 
   /// ft.exc_cd,  ft.branch_cd, ft.cmp_cd, and fm.branch_cd = ft.branch_cd 
 
-  let query = ` SELECT ft.segment, ft.nor_depos, ft.fin_year,
-     ft.voucher_no,ft.book_type, ft.trans_date, fm.act_name,fm.act_cd ,ft.amount, ft.drcr ,ft.trans_type
-     FROM cdbm.fin_transactions ft 
+  let query = ` SELECT ft.segment, ft.nor_depos, ft.fin_year, ft.voucher_no voucher_no, ft.book_type book_type, ft.trans_date trans_date, fm.account_name act_name,
+         fm.act_cd ,ft.amount, ft.drcr ,ft.trans_type FROM cdbm.fin_transactions ft 
      join cdbm.fin_account_master fm on fm.act_Cd = ft.act_cd 
 	WHERE ft.trans_type = '` +  TransactionType + `'` +
  ` union
@@ -162,7 +161,7 @@ SELECT ft.segment, ft.nor_depos, ft.fin_year,
   //console.log('query --> ', query);
 
   if (accountName) {
-    query += ` AND fm.act_name ilike  '%` + accountName + `%'`;
+    query += ` AND fm.account_name ilike  '%` + accountName + `%'`;
   }
  
   // if (branchNamecd) {
@@ -185,13 +184,11 @@ SELECT ft.segment, ft.nor_depos, ft.fin_year,
     query += ` AND book_type = '` + bookType + `'`;
     
   }
-
+  query += ` order by trans_date desc, voucher_no, book_type `;
+//console.log('query -> ', query);
   try {
-    //console.log('Final query:', query);
-    //console.log('With parameters:', queryParams);
     const result = await pool.query(query);
     res.json(result.rows);
-    //console.log('Query result---:', result.rows);
   } catch (err) {
     console.error('Error executing query:', err.message);
     res.status(500).send('Server error');
@@ -214,19 +211,23 @@ payment_voucher_router.get('/searchVoucharById', async (req, res) => {
   ` AND fin_year = ` + fin_year +
    ` AND ft.book_type = '` + bookType + `'` +
   ` AND ft.trans_type = '` + tranType + `'` +
+  ` AND ft.book_type = '` + bookType  + `'` +
   ` and ft.act_cd is null  `  ;
   
   // ft.branch_cd, ft.cmp_cd,
   
   let lv_dtl_query = ` SELECT ft.segment, ft.activity_cd, ft.nor_depos, ft.fin_year,  ft.nse_narr_code,` +
     `           ft.voucher_no, ft.book_type, (ft.trans_date AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata') AS trans_date,ft.amount, ft.drcr, ft.narration, ` +
-    `           (ft.eff_date AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata') AS eff_date,ft.narr_code,ft.act_cd,fm.act_name,ft.d_add_date ,ft.trans_type` +
-    `   FROM cdbm.fin_transactions ft join cdbm.fin_account_master fm on fm.act_Cd = ft.act_cd and fm.nor_depos = ft.nor_depos ` +
+    `           (ft.eff_date AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata') AS eff_date,ft.narr_code,ft.act_cd,fm.account_name act_name,ft.d_add_date ,ft.trans_type` +
+    `   FROM cdbm.fin_transactions ft join cdbm.fin_account_master fm on fm.act_Cd = ft.act_cd  ` +
     `        and fm.segment = ft.segment` +
     ` WHERE voucher_no = ` + voucherNo +
     ` AND fin_year = ` + fin_year +
    ` AND ft.trans_type = '` + tranType + `'` +
+   ` AND ft.book_type = '` + bookType  + `'` +
    ` and ft.cb_act_cd is null  ` ;
+
+   // and fm.nor_depos = ft.nor_depos
 
   try {
    // console.log('Final query:', lv_dtl_query);

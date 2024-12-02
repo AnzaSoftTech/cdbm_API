@@ -23,7 +23,7 @@ port:process.env.DB_PORT
 
 
 sauda_book_router.get('/sauda_book', async (req, res) => {
-    console.log('/sauda_book is called');
+  //  console.log('/sauda_book is called');
     const {
         clientcd,
         scripcd,

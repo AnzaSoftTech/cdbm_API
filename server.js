@@ -161,7 +161,7 @@ app.use(`${baseURL}/searchVouchers`, payment_receipt_routes);
 app.use(`${baseURL}/fin_company/:voucherDate`, payment_receipt_routes);
 app.use(`${baseURL}/exchange`, payment_receipt_routes);
 app.use(`${baseURL}/bill_master`, payment_receipt_routes);
-app.use(`${baseURL}/voucher`, payment_receipt_routes);
+app.use(`${baseURL}/save_payment_voucher`, payment_receipt_routes);
 
 app.use(`${baseURL}`, journal_voucher_routes);
 app.use(`${baseURL}/bookType`, journal_voucher_routes);

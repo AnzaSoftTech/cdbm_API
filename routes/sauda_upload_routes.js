@@ -121,6 +121,7 @@ sauda_upload_router.get('/last_upd_date_status', async (req, res) => {
         {
            await execProcedure(filePath, selectedRadioOpt);
            const returnValue = await pool.query('CALL cdbm.usp_File_Upload($1, $2, $3, $4)', [TradeFileName, selectedRadioOpt, TradeDate, 0]);
+           console.log('returnValue.rows[0].p_status -> ', returnValue.rows[0].p_status);
            res.json({message: returnValue.rows[0].p_status }); 
         }
         fs.unlinkSync(filePath);
@@ -722,6 +723,27 @@ sauda_upload_router.get('/last_upd_date_status', async (req, res) => {
   
 */
 
+sauda_upload_router.get('/chk_auct_price_exists', async (req, res) => {
+
+  const query = `SELECT 1 FROM cdbm.stag_auction_price; `;
+
+  try {
+
+    const result = await pool.query(query);
+
+      // Check if data is returned
+      if (result.rows.length > 0) {
+        res.json({message: '1' });
+         // console.log('result:', result.rows);
+      } else {
+        res.json({message: '0' });
+      }
+  } catch (err) {
+     // console.error('Error fetching data:', err);
+      res.status(500).send('Server Error');
+  }
+});
+
 sauda_upload_router.get('/stag_auction', async (req, res) => {
   const symbol = req.query.symbol;
 
@@ -816,6 +838,7 @@ sauda_upload_router.get('/stag_auction', async (req, res) => {
      // console.log('lv_count ===>', lv_count);
       if (lv_count.rows[0].cnt === '0')
       {
+       // console.log('before usp_Auction_Qty_Alloc');
         const lv_status = await pool.query('CALL cdbm.usp_Auction_Qty_Alloc($1)', [0]);
         if (lv_status.rows[0].p_status == '1')
         {
@@ -836,7 +859,7 @@ sauda_upload_router.get('/stag_auction', async (req, res) => {
        // res.status(200).json({ message: 'Data saved successfully' });
     } catch (error) {
         await pool.query('ROLLBACK'); // Rollback transaction in case of error
-        console.error('Error saving data:', error);
+        console.error('Error saveAuctionDetails => :', error);
         res.status(500).json({ message: 'Error saving data' });
     }
   });

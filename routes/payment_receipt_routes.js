@@ -33,7 +33,7 @@ payment_voucher_router.get('/cash_bank_master', async (req, res) => {
   try {
     //const { p_book_type, p_exchange, p_segment, p_branch_cd } = req.query;
 
-    let query = `SELECT cb_act_cd, account_title bank_ac_name ` +
+    let query = `SELECT cb_act_cd, bank_name || ' ' || coalesce(bank_acc_no, '') bank_ac_name ` +
       ` FROM cdbm.fin_cash_bank_master order by bank_name `;
     const result = await pool.query(query);
     res.json(result.rows);
@@ -123,11 +123,13 @@ payment_voucher_router.get('/searchAccount', async (req, res) => {
     query += ' AND account_name ILIKE $3';
     queryParams.push(`%${name}%`);
   }
-  //console.log('activity_cd -> ', activity_cd);
+
+  // console.log('query -> ', query);
+  // console.log('queryParams -> ', queryParams);
 
   try {
     const result = await pool.query(query, queryParams);
-   // console.log('result --> ', result);
+    //console.log('result --> ', result);
     res.json(result.rows);
   } catch (err) {
     console.error(err.message);
@@ -510,9 +512,8 @@ payment_voucher_router.post('/voucher_edit', async (req, res) => {
 
 });
 
-/////////////////////////////////////////////////////////////
 
-payment_voucher_router.post('/voucher', async (req, res) => {
+payment_voucher_router.post('/save_payment_voucher', async (req, res) => {
   const { header, details, vendorDetails } = req.body;
   //const { bookType, voucherDate, effectiveDate, TransactionType, userId } = header;
   const {cbaccount,
@@ -689,17 +690,18 @@ payment_voucher_router.post('/voucher', async (req, res) => {
               WHERE fin_year = $1 
                   AND book_type = $2 
                   AND activity_code = $3
-                  AND seg_code = $4
-          `;
+                  AND seg_code = $4`;
 
       await pool.query(updateJVNoQuery, [finYear, bookType, hdractivitycode, segment]);
 
       await pool.query('COMMIT');
-      res.status(200).send('Voucher(s) inserted successfully');
+      res.json({message: currentJVNo });
+      //res.status(200).send('Voucher(s) inserted successfully');
     } catch (error) {
       await pool.query('ROLLBACK');
       console.error('Error inserting voucher:', error);
-      res.status(500).send('Error inserting voucher(s). Please try again.');
+      //res.json({message: '-1' });
+      res.status(500).send('Error inserting payment voucher. Please try again.');
     }
   });
 

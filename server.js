@@ -15,6 +15,14 @@ const sauda_report_routes = require('./routes/sauda_report_routes');
 const cashbank_master_routes = require('./routes/cashbank_master_routes');
 const acct_master_routes = require('./routes/account_master_routes');
 const booktype_mast_routes = require('./routes/booktype_mast_routes');
+const common_routes = require('./routes/common_routes');
+const client_master_routes = require('./routes/client_master_routes.js');
+const brok_slab_routes = require('./routes/brok_slab_routes.js');
+const client_link_slab_routes = require('./routes/client_link_slab_routes.js');
+const doc_mapp_master_routes = require('./routes/doc_mapp_master_routes.js');
+const family_group_routes = require('./routes/family_group_routes.js');
+const client_group_routes = require('./routes/client_group_routes.js');
+const mii_master_routes = require('./routes/mii_master_routes.js');
 
 const cors = require('cors');
 const path = require('path');
@@ -138,6 +146,17 @@ app.use(`${baseURL}/insert-settlement-master-stag`, sauda_upload_routes);
 app.use(`${baseURL}/exec_db_Procedure`, sauda_upload_routes);
 app.use(`${baseURL}/job-status/:jobId`, sauda_upload_routes);
 
+// *************************************************************************************************
+// Start : Commonly used API
+// *************************************************************************************************
+
+app.use(`${baseURL}`, common_routes);
+app.use(`${baseURL}/bookType`, common_routes);
+app.use(`${baseURL}/exchange`, common_routes);
+
+// *************************************************************************************************
+// End : Commonly used API
+// *************************************************************************************************
 
 app.use(`${baseURL}`, master_upload_routes);
 app.use(`${baseURL}/sauda_metadata`, master_upload_routes);
@@ -159,25 +178,30 @@ app.use(`${baseURL}/Account`, payment_receipt_routes);
 app.use(`${baseURL}/searchAccount`, payment_receipt_routes);
 app.use(`${baseURL}/searchVouchers`, payment_receipt_routes);
 app.use(`${baseURL}/fin_company/:voucherDate`, payment_receipt_routes);
-app.use(`${baseURL}/exchange`, payment_receipt_routes);
 app.use(`${baseURL}/bill_master`, payment_receipt_routes);
 app.use(`${baseURL}/save_payment_voucher`, payment_receipt_routes);
 
 app.use(`${baseURL}`, journal_voucher_routes);
-app.use(`${baseURL}/bookType`, journal_voucher_routes);
+//app.use(`${baseURL}/bookType`, journal_voucher_routes);
 app.use(`${baseURL}/branches`, journal_voucher_routes);
 app.use(`${baseURL}/Account`, journal_voucher_routes);
-app.use(`${baseURL}/searchVouchers`, journal_voucher_routes);
+//app.use(`${baseURL}/searchVouchers`, journal_voucher_routes);
+app.use(`${baseURL}/searchJv`, journal_voucher_routes);
 app.use(`${baseURL}/searchEditVouchar`, journal_voucher_routes);
 app.use(`${baseURL}/fin_company/:voucherDate`, journal_voucher_routes);
-app.use(`${baseURL}/exchange`, journal_voucher_routes);
+//app.use(`${baseURL}/exchange`, journal_voucher_routes);
 app.use(`${baseURL}/save_journal_voucher`, journal_voucher_routes);
 
 app.use(`${baseURL}`, dr_cr_note_routes);
 app.use(`${baseURL}/branches`, dr_cr_note_routes);
 app.use(`${baseURL}/Account`, dr_cr_note_routes);
-app.use(`${baseURL}/searchAccount`, dr_cr_note_routes);
-app.use(`${baseURL}/searchVouchers`, dr_cr_note_routes);
+// app.use(`${baseURL}/searchAccount`, dr_cr_note_routes);
+// app.use(`${baseURL}/searchVouchers`, dr_cr_note_routes);
+app.use(`${baseURL}/searchAccountDrCr`, dr_cr_note_routes);
+app.use(`${baseURL}/searchVouchersDrCr`, dr_cr_note_routes);
+app.use(`${baseURL}/searchEditVoucharDrCr`, dr_cr_note_routes);
+
+
 app.use(`${baseURL}/fin_company/:voucherDate`, dr_cr_note_routes);
 app.use(`${baseURL}/voucher`, dr_cr_note_routes);
 
@@ -185,7 +209,7 @@ app.use(`${baseURL}`, contra_voucher_routes);
 app.use(`${baseURL}/last_upd_date_status`, contra_voucher_routes);
 app.use(`${baseURL}/cash_bank_master`, contra_voucher_routes);
 app.use(`${baseURL}/branches`, contra_voucher_routes);
-app.use(`${baseURL}/exchange`, contra_voucher_routes);
+//app.use(`${baseURL}/exchange`, contra_voucher_routes);
 app.use(`${baseURL}/analyzercode`, contra_voucher_routes);
 app.use(`${baseURL}/populatedetails`, contra_voucher_routes);
 app.use(`${baseURL}/save_contra_voucher`, contra_voucher_routes);
@@ -237,6 +261,123 @@ app.use(`${baseURL}/ddl_segment_master`, booktype_mast_routes);
 app.use(`${baseURL}/ddl_activity_master`, booktype_mast_routes);
 app.use(`${baseURL}/save_bookType`, booktype_mast_routes);
 app.use(`${baseURL}/search_BookType`, booktype_mast_routes);
+
+app.use(`${baseURL}`, client_master_routes);
+app.use(`${baseURL}/search_client_grp`, client_master_routes);
+app.use(`${baseURL}/search_family_grp`, client_master_routes);
+app.use(`${baseURL}/search_depos_name`, client_master_routes);
+app.use(`${baseURL}/nationality_list_comm_mas`, client_master_routes);
+app.use(`${baseURL}/state_list_comm_mas`, client_master_routes);
+app.use(`${baseURL}/ddl_subcatg`, client_master_routes);
+app.use(`${baseURL}/get_doc_types`, client_master_routes);
+app.use(`${baseURL}/get_doc_names`, client_master_routes);
+app.use(`${baseURL}/get_sub_catg_mii_dets`, client_master_routes);
+app.use(`${baseURL}/get_subdealer_ddl`, client_master_routes);
+app.use(`${baseURL}/client-Occupation`, client_master_routes);
+app.use(`${baseURL}/client-designation`, client_master_routes);
+app.use(`${baseURL}/client-prefix`, client_master_routes);
+app.use(`${baseURL}/client-gender`, client_master_routes);
+app.use(`${baseURL}/client-marital_status`, client_master_routes);
+app.use(`${baseURL}/client-bank_ac_type`, client_master_routes);
+app.use(`${baseURL}/client-proof_type`, client_master_routes);
+app.use(`${baseURL}/client-politic_exposed`, client_master_routes);
+app.use(`${baseURL}/searchBrokCode`, client_master_routes);
+app.use(`${baseURL}/ddl_catg_doc_mapp`, client_master_routes);
+app.use(`${baseURL}/ddl_sub_catg_doc_mapp`, client_master_routes);
+app.use(`${baseURL}/ddl_doc_names`, client_master_routes);
+app.use(`${baseURL}/mii_names_ddl`, client_master_routes);
+app.use(`${baseURL}/segments_ddl`, client_master_routes);
+app.use(`${baseURL}/dealer_ddl`, client_master_routes);
+app.use(`${baseURL}/searchPAN`, client_master_routes);
+app.use(`${baseURL}/ClientAllDATA`, client_master_routes);
+
+app.use(`${baseURL}`, brok_slab_routes);
+app.use(`${baseURL}/slab-settlementTye`, brok_slab_routes);
+app.use(`${baseURL}/cash_bill_slab_master`, brok_slab_routes);
+app.use(`${baseURL}/save_normal_slab`, brok_slab_routes);
+app.use(`${baseURL}/get_cash_bill_normal_slab/:slab_id`, brok_slab_routes);
+app.use(`${baseURL}/search_cash_bill_slab/:slab_id`, brok_slab_routes);
+app.use(`${baseURL}/CASH_BILL_DEL_RANGE_MASTER`, brok_slab_routes);
+app.use(`${baseURL}/save_genrange_slab`, brok_slab_routes);
+app.use(`${baseURL}/cash_bill_Genrange_slab`, brok_slab_routes);
+app.use(`${baseURL}/get_gen_ranges_on_select`, brok_slab_routes);
+app.use(`${baseURL}/get_del_ranges_on_select`, brok_slab_routes);
+app.use(`${baseURL}/cash_bill_Delrange_slab`, brok_slab_routes);
+app.use(`${baseURL}/save_Delrange_slab`, brok_slab_routes);
+app.use(`${baseURL}/save_scrip_slab`, brok_slab_routes);
+app.use(`${baseURL}/cash_bill_scrip_slab/:slab_id`, brok_slab_routes);
+app.use(`${baseURL}/searchScrip`, brok_slab_routes);
+app.use(`${baseURL}/rangeNamesNormal`, brok_slab_routes);
+app.use(`${baseURL}/rangeNamesDel`, brok_slab_routes);
+
+app.use(`${baseURL}`, client_link_slab_routes);
+app.use(`${baseURL}/save_cli_link_slab`, client_link_slab_routes);
+app.use(`${baseURL}/save_cli_slab_attach`, client_link_slab_routes);
+app.use(`${baseURL}/get_client_slab_attach/:clientcd`, client_link_slab_routes);
+app.use(`${baseURL}/get_client_name`, client_link_slab_routes);
+app.use(`${baseURL}/get_client_link_slab/:client_cd`, client_link_slab_routes);
+app.use(`${baseURL}/ddl_segment_master`, client_link_slab_routes);
+app.use(`${baseURL}/ddl_brok_slabs`, client_link_slab_routes);
+app.use(`${baseURL}/ddl_activity_master`, client_link_slab_routes);
+app.use(`${baseURL}/exchange_ddl`, client_link_slab_routes);
+app.use(`${baseURL}/search_cliName_frm_client_master`, client_link_slab_routes);
+
+app.use(`${baseURL}`, doc_mapp_master_routes);
+app.use(`${baseURL}/save_doc_mapp_master`, doc_mapp_master_routes);
+app.use(`${baseURL}/ddl_catg_doc_mapp`, doc_mapp_master_routes);
+app.use(`${baseURL}/ddl_sub_catg_doc_mapp`, doc_mapp_master_routes);
+app.use(`${baseURL}/search_doc_mapp_master`, doc_mapp_master_routes);
+app.use(`${baseURL}/search_doc_mapp_Master_ById`, doc_mapp_master_routes);
+app.use(`${baseURL}/ddl_doc_names`, doc_mapp_master_routes);
+
+app.use(`${baseURL}`, family_group_routes);
+app.use(`${baseURL}/save_family_grp`, family_group_routes);
+app.use(`${baseURL}/search_family_grp`, family_group_routes);
+app.use(`${baseURL}/search_family_grp_ById`, family_group_routes);
+app.use(`${baseURL}/get_client_name`, family_group_routes);
+app.use(`${baseURL}/search_cliName_frm_client_master`, family_group_routes);
+app.use(`${baseURL}/upd_client_link`, family_group_routes);
+app.use(`${baseURL}/upd_client_links`, family_group_routes);
+app.use(`${baseURL}/delete_client_link`, family_group_routes);
+app.use(`${baseURL}/delete_client_links`, family_group_routes);
+app.use(`${baseURL}/get_linked_client`, family_group_routes);
+
+app.use(`${baseURL}`, client_group_routes);
+app.use(`${baseURL}/save_cli_grp`, client_group_routes);
+app.use(`${baseURL}/search_client_grp`, client_group_routes);
+app.use(`${baseURL}/search_cli_grp_ById`, client_group_routes);
+app.use(`${baseURL}/get_client_name`, client_group_routes);
+app.use(`${baseURL}/search_cliName_frm_client_master`, client_group_routes);
+app.use(`${baseURL}/upd_client_link`, client_group_routes);
+app.use(`${baseURL}/upd_client_links`, client_group_routes);
+app.use(`${baseURL}/delete_client_link`, client_group_routes);
+app.use(`${baseURL}/delete_client_links`, client_group_routes);
+app.use(`${baseURL}/get_linked_client`, client_group_routes);
+
+app.use(`${baseURL}`, mii_master_routes);
+app.use(`${baseURL}/ddl_mii_bank_types`, mii_master_routes);
+app.use(`${baseURL}/ddl_cb_book_types`, mii_master_routes);
+app.use(`${baseURL}/get_bankname_accountno`, mii_master_routes);
+app.use(`${baseURL}/save_mii_master`, mii_master_routes);
+app.use(`${baseURL}/ddl_mii_master`, mii_master_routes);
+app.use(`${baseURL}/ddl_demat_mii_master`, mii_master_routes);
+app.use(`${baseURL}/ddl_mii_cc_id`, mii_master_routes);
+app.use(`${baseURL}/ddl_segment_master`, mii_master_routes);
+app.use(`${baseURL}/search_Mii_Master`, mii_master_routes);
+app.use(`${baseURL}/get_MII_bank_details`, mii_master_routes);
+app.use(`${baseURL}/search_Mii_Master_ById`, mii_master_routes);
+app.use(`${baseURL}/save_MII_Bank_Details`, mii_master_routes);
+app.use(`${baseURL}/save_MII_Deemat_Details`, mii_master_routes);
+app.use(`${baseURL}/get_MII_deemat_details`, mii_master_routes);
+app.use(`${baseURL}/save_address_cont_persons`, mii_master_routes);
+app.use(`${baseURL}/get_addresses`, mii_master_routes);
+app.use(`${baseURL}/get_cont_persons`, mii_master_routes);
+app.use(`${baseURL}/ddl_activity_master`, mii_master_routes);
+app.use(`${baseURL}/ddl_fin_group_level2`, mii_master_routes);
+app.use(`${baseURL}/ddl_fin_group_level3`, mii_master_routes);
+app.use(`${baseURL}/ddl_fin_group_level4`, mii_master_routes);
+app.use(`${baseURL}/ddl_MI_master`, mii_master_routes);
+
 
 //app.use('${baseURL}', routes);
 // Routes

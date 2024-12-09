@@ -201,7 +201,7 @@ dr_cr_notes_router.post('/save_dr_cr_note', async (req, res) => {
           normal_deposit, narration, act_cd, analyzer_code, voucherNo, bookType, transType]);
 
       }
-      await pool.query('CALL cdbm.update_fin_temp($1, $2, $3, $4, $5, $6, $7)'
+      await pool.query('CALL cdbm.update_fin_transactions($1, $2, $3, $4, $5, $6, $7)'
         , [finYear, bookType, voucherNo, null, segment, activityCode, normal_deposit]);
     }
     else {

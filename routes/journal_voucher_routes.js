@@ -37,7 +37,7 @@ journal_vouchar_router.get('/bookType', async (req, res) => {
   }
 });
 
-journal_vouchar_router.get('/api/branches', async (req, res) => {
+journal_vouchar_router.get('/branches', async (req, res) => {
   try {
     const result = await pool.query('SELECT branch_cd,branch_name FROM cdbm.branch_master order by branch_name');
     res.json(result.rows);
@@ -46,7 +46,7 @@ journal_vouchar_router.get('/api/branches', async (req, res) => {
   }
 });
 
-journal_vouchar_router.get('/api/Account', async (req, res) => {
+journal_vouchar_router.get('/Account', async (req, res) => {
   try {
     const result = await pool.query('SELECT act_cd, account_name FROM cdbm.fin_account_master order by account_name');
     res.json(result.rows);

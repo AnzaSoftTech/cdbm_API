@@ -467,7 +467,7 @@ payment_voucher_router.post('/voucher_edit', async (req, res) => {
                       `    and ft.book_type = tmp.book_type ` +
                       `    and ft.voucher_no =  tmp.voucher_no ` +
                       `    and ft.segment = tmp.segment ` +
-                      `    and ft.activity_cd = tmp.activity_cd ` +
+                      `    and ft.cmp_cd = tmp.activity_cd ` +
                       `    and ft.act_cd = tmp.act_cd; `;  
 
    //console.log('voucher_edit ---> 6 upd_Dtl_Query ', upd_Dtl_Query);
@@ -482,7 +482,7 @@ payment_voucher_router.post('/voucher_edit', async (req, res) => {
                           and ft.act_cd = tmp.act_cd`) ;  
 
       const ins_Dtl_Query = `INSERT INTO cdbm.fin_transactions 
-                     (fin_year, voucher_no, book_type, activity_cd, segment, act_cd, nor_depos,
+                     (fin_year, voucher_no, book_type, cmp_cd, segment, act_cd, nor_depos,
                       trans_type, trans_date, eff_date, cheque_no, amount, payer_payee,
                       drcr, narration, narr_code, nse_narr_code, n_add_user_id, d_add_date) ` +
                  `  select tmp.fin_year, tmp.voucher_no, tmp.book_type, tmp.activity_cd, tmp.segment, tmp.act_cd, tmp.nor_depos,

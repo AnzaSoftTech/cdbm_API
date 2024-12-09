@@ -203,7 +203,7 @@ payment_voucher_router.get('/searchVoucharById', async (req, res) => {
  // console.log('Received query parameters:', req.query);
 
   // ft.branch_cd, ft.cmp_cd,
-  let lv_hdr_query = ` SELECT ft.segment, ft.activity_cd, ft.nor_depos, ft.fin_year,  ` +
+  let lv_hdr_query = ` SELECT ft.segment, ft.cmp_cd activity_cd, ft.nor_depos, ft.fin_year,  ` +
   `ft.voucher_no, ft.book_type, (ft.trans_date AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata') AS trans_date,ft.amount, ft.drcr, ` +
    `ft.narration,(ft.eff_date AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata') AS eff_date,ft.narr_code, ft.cb_act_cd, ` +
    ` ft.d_add_date, ft.trans_type,ft.nse_narr_code,
@@ -218,7 +218,7 @@ payment_voucher_router.get('/searchVoucharById', async (req, res) => {
   
   // ft.branch_cd, ft.cmp_cd,
   
-  let lv_dtl_query = ` SELECT ft.segment, ft.activity_cd, ft.nor_depos, ft.fin_year,  ft.nse_narr_code,` +
+  let lv_dtl_query = ` SELECT ft.segment, ft.cmp_cd activity_cd, ft.nor_depos, ft.fin_year,  ft.nse_narr_code,` +
     `           ft.voucher_no, ft.book_type, (ft.trans_date AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata') AS trans_date,ft.amount, ft.drcr, ft.narration, ` +
     `           (ft.eff_date AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata') AS eff_date,ft.narr_code,ft.act_cd,fm.account_name act_name,ft.d_add_date ,ft.trans_type` +
     `   FROM cdbm.fin_transactions ft join cdbm.fin_account_master fm on fm.act_Cd = ft.act_cd  ` +
@@ -594,7 +594,7 @@ payment_voucher_router.post('/save_payment_voucher', async (req, res) => {
 
     const insertQueryheader = `
     INSERT INTO cdbm.fin_transactions 
-        (book_type, trans_date, eff_date, cb_act_cd, amount, drcr, segment, activity_cd, nor_depos, 
+        (book_type, trans_date, eff_date, cb_act_cd, amount, drcr, segment, cmp_cd, nor_depos, 
           narration, fin_year, voucher_no, narr_code, trans_type, n_add_user_id, nse_narr_code, 
           cheque_no, payer_payee, payment_mode, reference_no, d_add_date)
     VALUES 
@@ -617,7 +617,7 @@ payment_voucher_router.post('/save_payment_voucher', async (req, res) => {
 
      const insertQuery = `
             INSERT INTO cdbm.fin_transactions 
-                (book_type, trans_date, eff_date, act_cd, amount, drcr, segment, activity_cd, nor_depos, 
+                (book_type, trans_date, eff_date, act_cd, amount, drcr, segment, cmp_cd, nor_depos, 
                   narration, fin_year, voucher_no, narr_code, trans_type, n_add_user_id, nse_narr_code,
                   cheque_no, payer_payee, payment_mode, reference_no, d_add_date)
             VALUES 

@@ -214,8 +214,8 @@ journal_vouchar_router.post('/save_journal_voucher', async (req, res) => {
                         nor_depos, narration, act_cd, narr_code, voucher_no,book_type, trans_type)
                     VALUES
                         ($1, to_date($2, 'YYYY-MM-DD'), to_date($3, 'YYYY-MM-DD'), $4, $5, $6, $7, $8, 
-                        $9, $10, $11, $12, $13, $14, $15, $16)
-                  `;
+                        $9, $10, $11, $12, $13, $14, $15, $16)`;
+
         await pool.query(insertQuery_fin, [finYear, voucherDate, effectiveDate, activityCode, null, amount, dr_cr, segment, exchange,
           normal_deposit, narration, act_cd, analyzer_code, voucherNo, bookType, 'JV']);
 

@@ -134,7 +134,7 @@ app.use(`${baseURL}`, ledger_routes);
 app.use(`${baseURL}/ledger`, ledger_routes);
 
 app.use(`${baseURL}`, trial_balance_routes);
-app.use(`${baseURL}/bal`, trial_balance_routes);
+app.use(`${baseURL}/trial_balance`, trial_balance_routes);
 
 //console.log('2 server.js *************************** baseURL', baseURL);
 app.use(`${baseURL}`, sauda_upload_routes);

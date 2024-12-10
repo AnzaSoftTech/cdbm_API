@@ -200,9 +200,10 @@ acct_mast_router.get('/ddl_segment_master', async (req, res) => {
   acct_mast_router.get('/search_account_master', async (req, res) => {
     const { p_account_name, p_group_code } = req.query;
 
+    //changes on 10/12/2024, added order by
     let query = `SELECT act_cd, account_name, status, ledg_type, type_acct  ` +
       `FROM cdbm.fin_account_master WHERE ledg_type= 'G' ` +
-      ` AND UPPER(account_name) LIKE UPPER('%` + p_account_name + `%') `;
+      ` AND UPPER(account_name) LIKE UPPER('%` + p_account_name + `%') ORDER BY account_name`;
   
     if (p_group_code) {
       query += `AND grp_code = ${p_group_code};`;

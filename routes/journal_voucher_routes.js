@@ -2,7 +2,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const { Pool } = require('pg');
-const { Console } = require('winston/lib/winston/transports');
 const journal_vouchar_router = express.Router();
 const app = express();
 const port = 3001;
@@ -80,7 +79,7 @@ journal_vouchar_router.get('/searchJv', async (req, res) => {
 
     }
 
-    query += ` order by ft.trans_date desc, ft.book_type, ft.voucher_no desc `;
+    query += ` order by ft.trans_date desc, ft.voucher_no desc, ft.book_type `; //changes on 10/12/2024, moved book type at the end
 
 
     //console.log('With parameters:', queryParams);
@@ -96,25 +95,21 @@ journal_vouchar_router.get('/searchJv', async (req, res) => {
 journal_vouchar_router.get('/searchEditVouchar', async (req, res) => {
   const { segment, exchange, nor_depos, fin_year, cmp_cd, voucherNo, bookType,act_cd ,branchNamecd, activityCode} = req.query;
   // console.log('Received query parameters:', req.query);
-//console.log('voucherNo in searchEditVouchar ', voucherNo);
+
 
   let lv_query = ` SELECT ft.segment, ft.exc_cd, ft.nor_depos, ft.fin_year, ft.voucher_no, ft.book_type, ft.cmp_cd ` +
     `, (ft.trans_date AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata') AS trans_date,ft.amount, ft.drcr ` +
     `, ft.narration,(ft.eff_date AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata') AS eff_date,ft.narr_code,ft.act_cd,fm.account_name act_name ` +
     `,ft.d_add_date FROM cdbm.fin_transactions ft join cdbm.fin_account_master fm on fm.act_Cd = ft.act_cd WHERE fin_year = $1 AND `+
-    `voucher_no = $2 AND book_type = $3 AND ft.segment ilike  '%` + segment + `%' AND ft.exc_cd = $4 AND ft.nor_depos = $5 ` +
-    ` AND fm.activity_cd = '3'`;
+    `voucher_no = $2 AND book_type = $3 AND ft.segment ilike  '%` + segment + `%' AND ft.exc_cd = $4 AND ft.nor_depos = $5 `+
+    `AND fm.activity_cd = $6`;
 
   try {
     // console.log('Final query:', lv_query);
     
-    const result = await pool.query(lv_query, [fin_year, voucherNo, bookType, exchange, nor_depos]);
+    const result = await pool.query(lv_query, [fin_year, voucherNo, bookType, exchange, nor_depos, activityCode]);
     res.json(result.rows);
-
-    // console.log('fin_year, voucherNo, bookType, exchange, nor_depos, activityCode', fin_year, voucherNo, bookType, exchange, nor_depos, activityCode);
-    
     // console.log('Query result:', result.rows);
-
   } catch (err) {
     console.error('Error executing query:', err.message);
     res.status(500).send('Server error');
@@ -152,19 +147,19 @@ to_date(to_char(fin_yr_to,'DD/MM/YYYY'),'DD/MM/YYYY')`;
 
 
 
-// journal_vouchar_router.get('/exchange', async (req, res) => {
-//   try {
-//     const result = await pool.query('SELECT exc_name, exc_cd FROM cdbm.DER_EXCHANGE_MASTER');
-//     res.json(result.rows);
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// });
+journal_vouchar_router.get('/exchange', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT exc_name, exc_cd FROM cdbm.DER_EXCHANGE_MASTER');
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 
 journal_vouchar_router.get('/ddl_exchange', async (req, res) => {
   try {
-    const result = await pool.query(`SELECT mii_id, mii_name FROM cdbm.mii_master where mii_catg = 'EXC'`);
+    const result = await pool.query('SELECT mii_id, mii_name FROM cdbm.mii_master');
     res.json(result.rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -194,7 +189,7 @@ journal_vouchar_router.get('/ddl_activity', async (req, res) => {
 journal_vouchar_router.post('/save_journal_voucher', async (req, res) => {
 
   const { header, details } = req.body;
-  const { bookType, voucherDate, effectiveDate, voucherNo, segment, exchange, activityCode, normal_deposit, finYear } = header;
+  const { bookType, voucherDate, effectiveDate, voucherNo, segment, exchange, activityCode, normal_deposit, finYear, userId } = header;
   // Ayaan
 
   try {
@@ -208,16 +203,19 @@ journal_vouchar_router.post('/save_journal_voucher', async (req, res) => {
         const { fin_year, act_name, dr_amount, cr_amount, dr_cr, narration, act_cd, branch_cd, cmp_cd, analyzer_code } = detail;
         let amount = (dr_cr === 'Dr') ? dr_amount : cr_amount;
 
+        //changes on 10/12/2024, added n_add_user_id
         const insertQuery_fin = `
                     INSERT INTO cdbm.fin_tran_temp
                         (fin_year, trans_date, eff_date, cmp_cd, cb_act_cd, amount, drcr, segment, exc_cd, 
-                        nor_depos, narration, act_cd, narr_code, voucher_no,book_type, trans_type)
+                        nor_depos, narration, act_cd, narr_code, voucher_no,book_type, trans_type, n_add_user_id)
                     VALUES
                         ($1, to_date($2, 'YYYY-MM-DD'), to_date($3, 'YYYY-MM-DD'), $4, $5, $6, $7, $8, 
-                        $9, $10, $11, $12, $13, $14, $15, $16)`;
+                        $9, $10, $11, $12, $13, $14, $15, $16, $17)
+                  `;
 
+        //changes on 10/12/2024, added userId
         await pool.query(insertQuery_fin, [finYear, voucherDate, effectiveDate, activityCode, null, amount, dr_cr, segment, exchange,
-          normal_deposit, narration, act_cd, analyzer_code, voucherNo, bookType, 'JV']);
+          normal_deposit, narration, act_cd, analyzer_code, voucherNo, bookType, 'JV', userId]);
 
       }
       await pool.query('CALL cdbm.update_fin_transactions($1, $2, $3, $4, $5, $6, $7)'
@@ -278,14 +276,15 @@ journal_vouchar_router.post('/save_journal_voucher', async (req, res) => {
       }
       const currentJVNo = jvnoResult.rows[0].jv_no;
 
+      //changes on 10/12/2024, added n_add_user_id
       const insertQuery = `
         INSERT INTO cdbm.fin_transactions 
             (book_type, trans_date, eff_date, cmp_cd, cb_act_cd, amount, drcr, segment, exc_cd,
              nor_depos, narration, fin_year, act_cd, voucher_no, 
-             narr_code, trans_type, d_add_date)
+             narr_code, trans_type, n_add_user_id, d_add_date)
         VALUES 
             ($1, to_date($2, 'YYYY-MM-DD'), to_date($3, 'YYYY-MM-DD'), $4, $5, 
-            $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, clock_timestamp())`;
+            $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, clock_timestamp())`;
 
       for (let detail of details) {
         // console.log('detail ', detail);
@@ -295,9 +294,10 @@ journal_vouchar_router.post('/save_journal_voucher', async (req, res) => {
         const { act_name, dr_amount, cr_amount, dr_cr, narration, act_cd, branch_cd, cmp_cd, analyzer_code } = detail;
         let amount = (dr_cr === 'Dr') ? dr_amount : cr_amount;
 
+        //changes on 10/12/2024, added userId
         await pool.query(insertQuery, [bookType, voucherDate, effectiveDate, activityCode, null, amount, dr_cr,
           segment, exchange, normal_deposit, narration, finYear,
-          act_cd, currentJVNo, analyzer_code, 'JV']);
+          act_cd, currentJVNo, analyzer_code, 'JV', userId]);
         // Ayaan header segmetn exchange, normal
       }
 

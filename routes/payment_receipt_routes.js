@@ -573,7 +573,7 @@ payment_voucher_router.post('/save_payment_voucher', async (req, res) => {
                          AND activity_code = $3 
                          AND seg_code = $4`;
 
-    console.log('finYear, bookType, hdractivitycode, segment ---> ', finYear, bookType, hdractivitycode, segment);
+   // console.log('finYear, bookType, hdractivitycode, segment ---> ', finYear, bookType, hdractivitycode, segment);
 
     const jvnoResult = await pool.query(jvnoQuery, [finYear, bookType, hdractivitycode, segment]);
     if (jvnoResult.rows.length === 0) {

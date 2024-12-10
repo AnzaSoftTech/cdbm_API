@@ -54,9 +54,10 @@ dr_cr_notes_router.get('/Account', async (req, res) => {
   }
 });
 
+//changed API name. Applied changes in server file as well.
 dr_cr_notes_router.get('/searchAccountDrCr', async (req, res) => {
   const { activity, segment, name } = req.query;
-  //console.log('req.query ', req.query);
+  console.log('req.query ', req.query);
   let queryParams = [];
   let query = 'SELECT act_cd, account_name FROM cdbm.fin_account_master WHERE 1=1';
 
@@ -86,11 +87,11 @@ dr_cr_notes_router.get('/searchAccountDrCr', async (req, res) => {
 
 dr_cr_notes_router.get('/searchVouchersDrCr', async (req, res) => {
   const { accountName, bookType, fromDate, toDate, tran_type } = req.query;
-  //console.log('data====', req.query)
+  console.log('data====', req.query)
   let queryParams = [];
   let query = `SELECT ft.segment, ft.exc_cd, ft.nor_depos, ft.fin_year, ft.branch_cd, ft.cmp_cd, ` +
     ` ft.voucher_no, ft.book_type, ft.trans_date, fm.account_name,ft.act_cd, ft.amount, ft.drcr, fm.activity_cd ` +
-    ` FROM cdbm.fin_transactions ft join cdbm.fin_account_master fm on fm.act_Cd = ft.act_cd  and fm.activity_cd = ft.cmp_cd  WHERE trans_type= '` + tran_type + `' `;
+    ` FROM cdbm.fin_transactions ft join cdbm.fin_account_master fm on fm.act_Cd = ft.act_cd   WHERE trans_type= '` + tran_type + `' `;
 
   if (accountName) {
     query += ` AND fm.account_name ilike  '%` + accountName + `%'`;
@@ -104,7 +105,7 @@ dr_cr_notes_router.get('/searchVouchersDrCr', async (req, res) => {
     query += ` AND ft.book_type = '` + bookType + `'`;
 
   }
-  query += ` order by ft.trans_date desc, ft.book_type, ft.voucher_no desc `;
+  query += ` order by ft.trans_date desc, ft.voucher_no desc, ft.book_type `; //changes on 10/12/2024, moved book type at the end
   try {
     const result = await pool.query(query, queryParams);
     res.json(result.rows);
@@ -122,7 +123,7 @@ dr_cr_notes_router.get('/searchEditVoucharDrCr', async (req, res) => {
   let lv_query = ` SELECT ft.segment, ft.exc_cd, ft.nor_depos, ft.fin_year, ft.voucher_no, ft.book_type, ft.cmp_cd ` +
     `, (ft.trans_date AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata') AS trans_date,ft.amount, ft.drcr ` +
     `, ft.narration,(ft.eff_date AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata') AS eff_date,ft.narr_code,ft.act_cd,fm.account_name act_name ` +
-    `,ft.d_add_date FROM cdbm.fin_transactions ft join cdbm.fin_account_master fm on fm.act_Cd = ft.act_cd and fm.activity_cd = ft.cmp_cd WHERE fin_year = $1 AND ` +
+    `,ft.d_add_date FROM cdbm.fin_transactions ft join cdbm.fin_account_master fm on fm.act_Cd = ft.act_cd WHERE fin_year = $1 AND ` +
     `voucher_no = $2 AND book_type = $3 AND ft.segment ilike  '%` + segment + `%' AND ft.nor_depos = $4 ` +
     `AND fm.activity_cd = $5`;
 
@@ -164,8 +165,6 @@ to_date(to_char(fin_yr_to,'DD/MM/YYYY'),'DD/MM/YYYY')`;
   }
 });
 
-
-
 dr_cr_notes_router.get('/exchange', async (req, res) => {
   try {
     const result = await pool.query('SELECT exc_name, exc_cd FROM cdbm.DER_EXCHANGE_MASTER');
@@ -174,7 +173,6 @@ dr_cr_notes_router.get('/exchange', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
 
 dr_cr_notes_router.post('/save_dr_cr_note', async (req, res) => {
   const { header, details } = req.body;
@@ -189,16 +187,17 @@ dr_cr_notes_router.post('/save_dr_cr_note', async (req, res) => {
           act_cd, branch_cd, analyzer_code } = detail; 
         let amount = (dr_cr === 'Dr') ? dr_amount : cr_amount;
 
+        //changes on 10/12/2024, added n_add_user_id
         const insertQuery_fin = `
                     INSERT INTO cdbm.fin_tran_temp
                         (fin_year, trans_date, eff_date, cmp_cd, cb_act_cd, amount, drcr, segment,
-                        nor_depos, narration, act_cd, narr_code, voucher_no,book_type, trans_type)
+                        nor_depos, narration, act_cd, narr_code, voucher_no,book_type, trans_type, n_add_user_id)
                     VALUES
                         ($1, to_date($2, 'YYYY-MM-DD'), to_date($3, 'YYYY-MM-DD'), $4, $5, $6, $7, $8, 
-                        $9, $10, $11, $12, $13, $14, $15)
+                        $9, $10, $11, $12, $13, $14, $15, $16)
                   `;
         await pool.query(insertQuery_fin, [finYear, voucherDate, effectiveDate, activityCode, null, amount, dr_cr, segment,
-          normal_deposit, narration, act_cd, analyzer_code, voucherNo, bookType, transType]);
+          normal_deposit, narration, act_cd, analyzer_code, voucherNo, bookType, transType, userId]);
 
       }
       await pool.query('CALL cdbm.update_fin_transactions($1, $2, $3, $4, $5, $6, $7)'
@@ -252,13 +251,15 @@ dr_cr_notes_router.post('/save_dr_cr_note', async (req, res) => {
           act_cd, branch_cd, analyzer_code } = detail;
         let amount = (dr_cr === 'Dr') ? dr_amount : cr_amount;
 
+        // changes on 10/12/2024, added add date
         const insertQuery = `
             INSERT INTO cdbm.fin_transactions 
                 (book_type, trans_date, eff_date, act_cd, amount, drcr, segment, exc_cd, nor_depos, 
-                  narration, fin_year, branch_cd, cmp_cd, voucher_no, narr_code, trans_type, n_add_user_id)
+                  narration, fin_year, branch_cd, cmp_cd, voucher_no, narr_code, trans_type, n_add_user_id, d_add_date)
             VALUES 
                 ($1, to_date($2, 'YYYY-MM-DD'), to_date($3, 'YYYY-MM-DD'), $4, $5, 
-                $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)`;
+                $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, clock_timestamp())`;
+                
         //console.log('insertQuery ==> ', insertQuery);
         console.log('branch_cd ---> ', branch_cd);
         // console.log('cmp_cd ---> ', cmp_cd);

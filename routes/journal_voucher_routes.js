@@ -102,14 +102,14 @@ journal_vouchar_router.get('/searchEditVouchar', async (req, res) => {
     `, ft.narration,(ft.eff_date AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata') AS eff_date,ft.narr_code,ft.act_cd,fm.account_name act_name ` +
     `,ft.d_add_date FROM cdbm.fin_transactions ft join cdbm.fin_account_master fm on fm.act_Cd = ft.act_cd WHERE fin_year = $1 AND `+
     `voucher_no = $2 AND book_type = $3 AND ft.segment ilike  '%` + segment + `%' AND ft.exc_cd = $4 AND ft.nor_depos = $5 `+
-    `AND fm.activity_cd = $6`;
+    `AND fm.activity_cd = ft.cmp_cd `;
 
   try {
-    // console.log('Final query:', lv_query);
-    
+   console.log('Final query:', lv_query);
+    console.log('[fin_year, voucherNo, bookType, exchange, nor_depos, activityCode] ', [fin_year, voucherNo, bookType, exchange, nor_depos]);
     const result = await pool.query(lv_query, [fin_year, voucherNo, bookType, exchange, nor_depos, activityCode]);
     res.json(result.rows);
-    // console.log('Query result:', result.rows);
+    console.log('Query result:', result.rows);
   } catch (err) {
     console.error('Error executing query:', err.message);
     res.status(500).send('Server error');

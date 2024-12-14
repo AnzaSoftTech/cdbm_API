@@ -23,6 +23,14 @@ const doc_mapp_master_routes = require('./routes/doc_mapp_master_routes.js');
 const family_group_routes = require('./routes/family_group_routes.js');
 const client_group_routes = require('./routes/client_group_routes.js');
 const mii_master_routes = require('./routes/mii_master_routes.js');
+const finance_report_routes = require('./routes/finance_report_routes');
+const opening_balance_routes = require('./routes/opening_balance_routes'); 
+const vendor_master_routes = require('./routes/vendor_master_routes');
+const activity_master_routes = require('./routes/activity_master_routes');
+const segment_master_routes = require('./routes/segment_master_routes');
+const dealer_sub_dealer_routes = require('./routes/dealer_sub_dealer_routes');
+const dealer_slab_routes = require('./routes/dealer_slab_routes');
+
 
 const cors = require('cors');
 const path = require('path');
@@ -152,6 +160,7 @@ app.use(`${baseURL}/job-status/:jobId`, sauda_upload_routes);
 
 app.use(`${baseURL}`, common_routes);
 app.use(`${baseURL}/bookType`, common_routes);
+app.use(`${baseURL}/bookType_multi_ddl`, common_routes);
 app.use(`${baseURL}/exchange`, common_routes);
 
 // *************************************************************************************************
@@ -377,6 +386,75 @@ app.use(`${baseURL}/ddl_fin_group_level2`, mii_master_routes);
 app.use(`${baseURL}/ddl_fin_group_level3`, mii_master_routes);
 app.use(`${baseURL}/ddl_fin_group_level4`, mii_master_routes);
 app.use(`${baseURL}/ddl_MI_master`, mii_master_routes);
+
+
+app.use(`${baseURL}`, finance_report_routes);
+app.use(`${baseURL}/day_book`, finance_report_routes);
+
+app.use(`${baseURL}`, opening_balance_routes);
+app.use(`${baseURL}/ddl_exchange`, opening_balance_routes);
+app.use(`${baseURL}/ddl_segment`, opening_balance_routes);
+app.use(`${baseURL}/ddl_activity_master`, opening_balance_routes);
+app.use(`${baseURL}/searchOpenBalAccount`, opening_balance_routes);
+app.use(`${baseURL}/save_open_bal`, opening_balance_routes);
+app.use(`${baseURL}/get_fin_year`, opening_balance_routes);
+app.use(`${baseURL}/val_fin_year`, opening_balance_routes);
+app.use(`${baseURL}/validate_account`, opening_balance_routes);
+app.use(`${baseURL}/searchOpenBal`, opening_balance_routes);
+
+app.use(`${baseURL}`, vendor_master_routes);
+app.use(`${baseURL}/ddl_MI_master`, vendor_master_routes);
+app.use(`${baseURL}/ddl_segment_master`, vendor_master_routes);
+app.use(`${baseURL}/ddl_fin_group_level2`, vendor_master_routes);
+app.use(`${baseURL}/ddl_desler_activity_master`, vendor_master_routes);
+app.use(`${baseURL}/ddl_fin_group_level3`, vendor_master_routes);
+app.use(`${baseURL}/ddl_fin_group_level4`, vendor_master_routes);
+app.use(`${baseURL}/save_account_master_vendor`, vendor_master_routes);
+app.use(`${baseURL}/save_address_cont_persons_vendor`, vendor_master_routes);
+app.use(`${baseURL}/get_cont_persons`, vendor_master_routes);
+app.use(`${baseURL}/get_addresses_vendor`, vendor_master_routes);
+app.use(`${baseURL}/client_bank_ac_type`, vendor_master_routes);
+app.use(`${baseURL}/get_bank_details`, vendor_master_routes);
+app.use(`${baseURL}/save_bank_details`, vendor_master_routes);
+app.use(`${baseURL}/search_account_master_vendor`, vendor_master_routes);
+app.use(`${baseURL}/search_Acc_Master_ById_vendor`, vendor_master_routes);
+
+app.use(`${baseURL}`, activity_master_routes);
+app.use(`${baseURL}/save_activity_master`, activity_master_routes);
+app.use(`${baseURL}/get_activities`, activity_master_routes);
+app.use(`${baseURL}/ddl_segment_master`, activity_master_routes);
+
+app.use(`${baseURL}`, segment_master_routes);
+app.use(`${baseURL}/save_segment`, segment_master_routes);
+app.use(`${baseURL}/serach_segment`, segment_master_routes);
+
+app.use(`${baseURL}`, dealer_sub_dealer_routes);
+app.use(`${baseURL}/ddl_segment_master`, dealer_sub_dealer_routes);
+app.use(`${baseURL}/ddl_activity_master`, dealer_sub_dealer_routes);
+app.use(`${baseURL}/ddl_MI_master`, dealer_sub_dealer_routes);
+app.use(`${baseURL}/ddl_slab_master`, dealer_sub_dealer_routes);
+app.use(`${baseURL}/get_dealer_master`, dealer_sub_dealer_routes);
+app.use(`${baseURL}/get_dealer_master_by_id`, dealer_sub_dealer_routes);
+app.use(`${baseURL}/save_exchange_link`, dealer_sub_dealer_routes);
+app.use(`${baseURL}/get_dealer_exchange`, dealer_sub_dealer_routes);
+app.use(`${baseURL}/save_dealer_master`, dealer_sub_dealer_routes);
+app.use(`${baseURL}/save_sub_dealer`, dealer_sub_dealer_routes);
+app.use(`${baseURL}/get_sub_dealer`, dealer_sub_dealer_routes);
+app.use(`${baseURL}/save_sub_exchange_link`, dealer_sub_dealer_routes);
+app.use(`${baseURL}/get_sub_dealer_exchange`, dealer_sub_dealer_routes);
+app.use(`${baseURL}/save_sub_dealer_sharing`, dealer_sub_dealer_routes);
+app.use(`${baseURL}/get_sub_dealer_sharing`, dealer_sub_dealer_routes);
+app.use(`${baseURL}/search_BankBranches`, dealer_sub_dealer_routes);
+app.use(`${baseURL}/get_addresses`, dealer_sub_dealer_routes);
+app.use(`${baseURL}/get_cont_persons`, dealer_sub_dealer_routes);
+app.use(`${baseURL}/save_dealer_addr_contacts`, dealer_sub_dealer_routes);
+
+app.use(`${baseURL}`, dealer_slab_routes);
+app.use(`${baseURL}/save_sharing_slab`, dealer_slab_routes);
+app.use(`${baseURL}/get_sharing_slabs`, dealer_slab_routes);
+app.use(`${baseURL}/validation`, dealer_slab_routes);
+app.use(`${baseURL}/save_sharing_percentage`, dealer_slab_routes);
+app.use(`${baseURL}/get_sharing_percentage`, dealer_slab_routes);
 
 
 //app.use('${baseURL}', routes);

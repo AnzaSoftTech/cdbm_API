@@ -85,7 +85,7 @@ Main Contract Note Data will be printed from below api. The below API will retur
 
       let query = `SELECT DISTINCT trd_client_cd client_cd, client_full_name || ' (' || cm.client_cd || ')' client_name , 
                           Corres_Addr_1, Corres_Addr_2, Corres_Addr_3, Corres_City, cm.pan pan_no, contract_no cont_note_no, 
-                          to_char(TRD_ENTER_DATE_TIME, 'DD/MM/YYYY') trade_date, int_mkt_type, trd_settle_no
+                          to_char(TRD_ENTER_DATE_TIME, 'DD/MM/YYYY') trade_date, int_mkt_type, trd_settle_no, email_id email_id
                    FROM cdbm.cash_sauda_book csb 
                    JOIN cdbm.ClientMaster cm ON cm.client_cd = csb.trd_client_cd
                    WHERE TO_DATE(CAST(TRD_ENTER_DATE_TIME AS VARCHAR(10)), 'YYYY-MM-DD') = TO_DATE('` + p_transaction_date + `', 'DD/MM/YYYY')

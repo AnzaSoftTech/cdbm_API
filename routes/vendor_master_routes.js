@@ -330,7 +330,7 @@ vend_mast_router.post('/save_bank_details', async (req, res) => {
 
         var bankUpdateQuery = `update cdbm.bankDetails set bank_for = $1, bank_name = $2, bank_acc_type = $3 , bank_acc_no = $4 , upi_id = $5 ` +
             `, start_date = $6, end_date = CASE WHEN $12 = 'I' THEN clock_timestamp() ELSE $7 END,  ifsc = $8, bank_addr_1 = $9, bank_addr_2 = $10 ` +
-            `, bank_addr_3 = $11, status = $12, add_user_id = $13, add_date = clock_timestamp() where bank_dtl_id = $14;`;
+            `, bank_addr_3 = $11, status = $12, upd_user_id = $13, upd_date = clock_timestamp() where bank_dtl_id = $14;`;
 
         for (const bankDetail of Bankdetails) {
 
@@ -339,15 +339,15 @@ vend_mast_router.post('/save_bank_details', async (req, res) => {
 
             if (bank_dtl_id) {
                 if (editMode) {
-                    await pool.query(bankUpdateQuery, ['accnt', bank_name, bank_acc_type, bank_acc_no, upi_id, start_date || null, end_date || null
-                        , ifsc, bank_address_1, bank_address_2, bank_address_3, ac_status, userId, bank_dtl_id]);
+                    await pool.query(bankUpdateQuery, ['accnt', bank_name, bank_acc_type, bank_acc_no, upi_id, start_date || null
+                        , end_date || null, ifsc, bank_address_1, bank_address_2, bank_address_3, ac_status, userId, bank_dtl_id]);
                 }
             }
             else {
                 bankDtlId += 1;
                 await pool.query(bankQuery, [
-                    bankDtlId, p_actCode, 'accnt', bank_name || null, bank_acc_type || null, bank_acc_no, upi_id, start_date || null, end_date || null
-                    , ifsc, bank_address_1, bank_address_2, bank_address_3, ac_status, userId,
+                    bankDtlId, p_actCode, 'accnt', bank_name || null, bank_acc_type || null, bank_acc_no, upi_id, start_date || null
+                    , end_date || null, ifsc, bank_address_1, bank_address_2, bank_address_3, ac_status, userId,
                 ]);
             }
         }

@@ -1,0 +1,11 @@
+2024-12-18T07:18:48.307Z error: 
+    Error Message: column "name" does not exist
+    Method: GET
+    URL: /api/client/1C008
+    Query: {}
+    Body: {}
+    File: error-logger.js
+    Line: 14
+    Column: 25
+    Function: logError
+  

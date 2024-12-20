@@ -65,7 +65,7 @@ mii_master_routes.get('/get_bankname_accountno', async (req, res) => {
 
 mii_master_routes.post('/save_mii_master', async (req, res) => {
     const { header } = req.body;
-    const { miiCode, miiSrcCode, miiCat, miiName, miiShortName, gstNo, panNo, tan, sebiRegNo, mii_cc_id, segment, activity, status, userId } = header;
+    const { miiCode, miiSrcCode, miiCat, miiName, miiShortName, gstNo, panNo, tan, sebiRegNo, mii_cc_id, activityCode, status, userId } = header;
 
     console.log('req.body ====> ', req.body);
 
@@ -89,20 +89,18 @@ mii_master_routes.post('/save_mii_master', async (req, res) => {
             // console.log('4');
             const lv_mii_id = lv_max_no;
             const lv_ins_statement = `Insert into cdbm.mii_master (
-                                        mii_id, mii_src_code, mii_catg, mii_name, mii_short_name, gst_no, pan, tan, sebi_regisn_no, mii_cc_id, seg_code, activity, status, add_user_id, add_date)
-                                  values ($1::numeric(5), $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, 
-                                  clock_timestamp());`;
+                                        mii_id, mii_src_code, mii_catg, mii_name, mii_short_name, gst_no, pan, tan, sebi_regisn_no, mii_cc_id, activity_code, status, add_user_id, add_date)
+                                  values ($1::numeric(5), $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, clock_timestamp());`;
 
-            await pool.query(lv_ins_statement, [lv_mii_id, miiSrcCode, miiCat, miiName, miiShortName, gstNo, panNo ? panNo : null, tan, sebiRegNo, mii_cc_id, segment, activity, status, userId]);
+            await pool.query(lv_ins_statement, [lv_mii_id, miiSrcCode, miiCat, miiName, miiShortName, gstNo, panNo ? panNo : null, tan, sebiRegNo, mii_cc_id, activityCode, status, userId]);
             console.log('7');
         }
         else {
             // lv_max_no = miiCode;
-            console.log('panNo......', panNo);
             lv_upd_statement = `update cdbm.mii_master 
-                              set mii_src_code=$1, mii_catg=$2, mii_name=$3, mii_short_name=$4, gst_no=$5, pan=$6, tan=$7, sebi_regisn_no=$8, mii_cc_id=$9, seg_code=$10, activity=$11, status=$12, upd_user_id=$13 , upd_date = clock_timestamp()
-          where mii_id = $14;`;
-            await pool.query(lv_upd_statement, [miiSrcCode, miiCat, miiName, miiShortName, gstNo, panNo ? panNo : null, tan, sebiRegNo, mii_cc_id, segment, activity, status, userId, miiCode]);
+                              set mii_name=$1, mii_short_name=$2, gst_no=$3, pan=$4, tan=$5, sebi_regisn_no=$6, mii_cc_id=$7, status=$8, upd_user_id=$9 , upd_date = clock_timestamp()
+          where mii_id = $10;`;
+            await pool.query(lv_upd_statement, [miiName, miiShortName, gstNo, panNo ? panNo : null, tan, sebiRegNo, mii_cc_id, status, userId, miiCode]);
         }
 
         await pool.query('COMMIT');
@@ -213,21 +211,14 @@ mii_master_routes.get('/get_MII_bank_details', async (req, res) => {
 mii_master_routes.get('/search_Mii_Master_ById', async (req, res) => {
     const { p_mii_id } = req.query;
 
-    let query = `  SELECT mii_id, mii_src_code, mii_catg, mii_name, mii_short_name, gst_no, pan, tan, sebi_regisn_no, mii_cc_id, seg_code, activity, status
+    let query = `  SELECT mii_id, mii_src_code, mii_catg, mii_name, mii_short_name, gst_no, pan, tan, sebi_regisn_no, mii_cc_id, activity_code activity, status
      ` +
         `  FROM cdbm.mii_master ` +
         `  WHERE mii_id = '` + p_mii_id + `';`;
-    // `        book_type,  act_type, act_catg, bank_branch_cd, grp_code, sub_grp_code, sub_sub_grp_code, ifsc, ` +
-    // `        cbm.micr micr, act_start_date, act_end_date, cbm.status status, exc_clearing_no, bal_drcr, ` +
-    // `        am.branch_name branch_name ` +
-    // `  LEFT JOIN cdbm.address_master am ON am.addr_id = cbm.bank_branch_cd ` +
 
     try {
-        //console.log('search by Id query:--->', query);
         const result = await pool.query(query);
-        console.log('result--->', result);
         res.json(result.rows);
-        // console.log('Query result:', result.rows);
     } catch (err) {
         console.error('Error executing query:--->', err.message);
         res.status(500).send('Server error');
@@ -235,7 +226,7 @@ mii_master_routes.get('/search_Mii_Master_ById', async (req, res) => {
 });
 
 mii_master_routes.post('/save_MII_Bank_Details', async (req, res) => {
-    //const { header, details } = req.body;
+
     const { header } = req.body;
     const { p_MII_code, bankDtlId, banktype, booktype, bankname, bankacctno, status, fromdate, todate, userId, } = header;
 
@@ -377,8 +368,6 @@ mii_master_routes.post('/save_address_cont_persons', async (req, res) => {
         }
         else {
             lv_addr_id = addrId;
-            console.log('in address update addrId -> ', addrId);
-            console.log('addrfor>>>>>>>>>', addrfor);
             lv_statement = `Update cdbm.address_master ` +
                 ` set branch_name = $1, addr_line1 = $2, addr_line2 = $3, addr_line3 = $4, ` +
                 `  city = $5, pin = $6, phone1 = $7, phone2 = $8, phone3 = $9, email_id = $10, website = $11,` +
@@ -435,6 +424,8 @@ mii_master_routes.post('/save_address_cont_persons', async (req, res) => {
     }
 });
 
+
+
 mii_master_routes.get('/get_addresses', async (req, res) => {
     const { p_addr_type, p_act_Code } = req.query;
 
@@ -455,6 +446,7 @@ mii_master_routes.get('/get_addresses', async (req, res) => {
     }
 });
 
+
 mii_master_routes.get('/get_cont_persons', async (req, res) => {
     const { p_addr_id } = req.query;
 
@@ -466,6 +458,60 @@ mii_master_routes.get('/get_cont_persons', async (req, res) => {
         res.json(result.rows);
     } catch (err) {
         console.error('Error executing query:', err.message);
+        res.status(500).send('Server error');
+    }
+});
+
+mii_master_routes.post('/save_mii_segments', async (req, res) => {
+    const { header, details } = req.body;
+    const { p_MII_code , userId } = header;
+
+    //console.log('save_mii_segments req.body ====> ', req.body);
+
+    try {
+
+        await pool.query('BEGIN');
+        var lv_statement = '';
+
+        for (let detail of details) {
+            const { segment, exist } = detail;
+            //console.log('p_MII_code, segment, userId ====> ', p_MII_code, segment, userId);
+            if (segment && exist === 'F') {
+                lv_statement = `insert into cdbm.mii_segment ( ` +
+                    `  mii_id, seg_code, add_user_id, add_date) ` +
+                    ` values ($1, $2, $3, clock_timestamp()) `;
+              //  console.log('lv_statement ====> ', lv_statement);
+                
+                await pool.query(lv_statement, [p_MII_code, segment, userId]);
+            }
+        } 
+
+        lv_statement = '';
+
+        await pool.query('COMMIT');
+        res.json({ message: 1 });
+    } catch (error) {
+        await pool.query('ROLLBACK');
+        console.error('Error inserting mii segment :', error);
+        res.status(500).send('Error inserting mii Segment. Please try again.');
+    }
+});
+
+
+mii_master_routes.get('/get_mii_segments', async (req, res) => {
+    const { p_MII_Code } = req.query;
+    
+    let query = `SELECT mii_id, seg_code, 'T' exist ` +
+        ` FROM cdbm.mii_segment WHERE mii_id = '` + p_MII_Code + `';`;
+
+       // console.log('get_mii_segments query ====> ', query);
+
+    try {
+        const result = await pool.query(query);
+        //console.log('Final result > :', result);
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Error get_mii_segments query:', err.message);
         res.status(500).send('Server error');
     }
 });

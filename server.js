@@ -162,6 +162,10 @@ app.use(`${baseURL}`, common_routes);
 app.use(`${baseURL}/bookType`, common_routes);
 app.use(`${baseURL}/bookType_multi_ddl`, common_routes);
 app.use(`${baseURL}/exchange`, common_routes);
+app.use(`${baseURL}/ddl_activity_master`, common_routes);
+app.use(`${baseURL}/ddl_activitywise_exchange`, common_routes);
+app.use(`${baseURL}/ddl_exchangewise_segment`, common_routes);
+
 
 // *************************************************************************************************
 // End : Commonly used API
@@ -227,11 +231,11 @@ app.use(`${baseURL}`, sauda_report_routes);
 app.use(`${baseURL}/company_details`, sauda_report_routes);
 app.use(`${baseURL}/exc_details`, sauda_report_routes);
 app.use(`${baseURL}/contract_notes`, sauda_report_routes);
-
+app.use(`${baseURL}/sendEmails_Contr_Notes`, sauda_report_routes);
 
 app.use(`${baseURL}`, cashbank_master_routes);
 app.use(`${baseURL}/ddl_segment_master`, cashbank_master_routes);
-app.use(`${baseURL}/ddl_activity_master`, cashbank_master_routes);
+//app.use(`${baseURL}/ddl_activity_master`, cashbank_master_routes);
 app.use(`${baseURL}/ddl_fin_group_level2`, cashbank_master_routes);
 app.use(`${baseURL}/ddl_fin_group_level3`, cashbank_master_routes);
 app.use(`${baseURL}/ddl_fin_group_level4`, cashbank_master_routes);
@@ -249,7 +253,7 @@ app.use(`${baseURL}/save_address_cont_persons`, cashbank_master_routes);
 
 app.use(`${baseURL}`, acct_master_routes);
 app.use(`${baseURL}/ddl_segment_master`, acct_master_routes);
-app.use(`${baseURL}/ddl_activity_master`, acct_master_routes);
+//app.use(`${baseURL}/ddl_activity_master`, acct_master_routes);
 app.use(`${baseURL}/ddl_fin_group_level2`, acct_master_routes);
 app.use(`${baseURL}/ddl_fin_group_level3`, acct_master_routes);
 app.use(`${baseURL}/ddl_fin_group_level4`, acct_master_routes);
@@ -267,7 +271,7 @@ app.use(`${baseURL}/get_bank_details`, acct_master_routes);
 
 app.use(`${baseURL}`, booktype_mast_routes);
 app.use(`${baseURL}/ddl_segment_master`, booktype_mast_routes);
-app.use(`${baseURL}/ddl_activity_master`, booktype_mast_routes);
+//app.use(`${baseURL}/ddl_activity_master`, booktype_mast_routes);
 app.use(`${baseURL}/save_bookType`, booktype_mast_routes);
 app.use(`${baseURL}/search_BookType`, booktype_mast_routes);
 
@@ -327,7 +331,7 @@ app.use(`${baseURL}/get_client_name`, client_link_slab_routes);
 app.use(`${baseURL}/get_client_link_slab/:client_cd`, client_link_slab_routes);
 app.use(`${baseURL}/ddl_segment_master`, client_link_slab_routes);
 app.use(`${baseURL}/ddl_brok_slabs`, client_link_slab_routes);
-app.use(`${baseURL}/ddl_activity_master`, client_link_slab_routes);
+//app.use(`${baseURL}/ddl_activity_master`, client_link_slab_routes);
 app.use(`${baseURL}/exchange_ddl`, client_link_slab_routes);
 app.use(`${baseURL}/search_cliName_frm_client_master`, client_link_slab_routes);
 
@@ -381,7 +385,7 @@ app.use(`${baseURL}/get_MII_deemat_details`, mii_master_routes);
 app.use(`${baseURL}/save_address_cont_persons`, mii_master_routes);
 app.use(`${baseURL}/get_addresses`, mii_master_routes);
 app.use(`${baseURL}/get_cont_persons`, mii_master_routes);
-app.use(`${baseURL}/ddl_activity_master`, mii_master_routes);
+//app.use(`${baseURL}/ddl_activity_master`, mii_master_routes);
 app.use(`${baseURL}/ddl_fin_group_level2`, mii_master_routes);
 app.use(`${baseURL}/ddl_fin_group_level3`, mii_master_routes);
 app.use(`${baseURL}/ddl_fin_group_level4`, mii_master_routes);
@@ -390,11 +394,12 @@ app.use(`${baseURL}/ddl_MI_master`, mii_master_routes);
 
 app.use(`${baseURL}`, finance_report_routes);
 app.use(`${baseURL}/day_book`, finance_report_routes);
+app.use(`${baseURL}/Get_Account_Name`, finance_report_routes);
 
 app.use(`${baseURL}`, opening_balance_routes);
 app.use(`${baseURL}/ddl_exchange`, opening_balance_routes);
 app.use(`${baseURL}/ddl_segment`, opening_balance_routes);
-app.use(`${baseURL}/ddl_activity_master`, opening_balance_routes);
+//app.use(`${baseURL}/ddl_activity_master`, opening_balance_routes);
 app.use(`${baseURL}/searchOpenBalAccount`, opening_balance_routes);
 app.use(`${baseURL}/save_open_bal`, opening_balance_routes);
 app.use(`${baseURL}/get_fin_year`, opening_balance_routes);
@@ -430,7 +435,7 @@ app.use(`${baseURL}/serach_segment`, segment_master_routes);
 
 app.use(`${baseURL}`, dealer_sub_dealer_routes);
 app.use(`${baseURL}/ddl_segment_master`, dealer_sub_dealer_routes);
-app.use(`${baseURL}/ddl_activity_master`, dealer_sub_dealer_routes);
+//app.use(`${baseURL}/ddl_activity_master`, dealer_sub_dealer_routes);
 app.use(`${baseURL}/ddl_MI_master`, dealer_sub_dealer_routes);
 app.use(`${baseURL}/ddl_slab_master`, dealer_sub_dealer_routes);
 app.use(`${baseURL}/get_dealer_master`, dealer_sub_dealer_routes);

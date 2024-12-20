@@ -83,8 +83,8 @@ booktype_mast_routes.get('/ddl_segment_master', async (req, res) => {
       const recordExists = lv_data_exist.rows[0].cnt_row > 0;
   
       if (recordExists) {
-        console.log('Updating existing book type...');
-        console.log('jvNo--------+++',jvNo);
+        // console.log('Updating existing book type...');
+        // console.log('jvNo--------+++',jvNo);
         const lv_upd_statement = `
           UPDATE cdbm.fin_book_type 
           SET seg_code = $1, activity_code = $2, jv_no = $3, description = $4, end_date = $5, 
@@ -104,7 +104,7 @@ booktype_mast_routes.get('/ddl_segment_master', async (req, res) => {
         res.json({ message: 'Book type updated successfully.' });
       } else {
         // Prepare bookType for insertion
-        console.log('jvNo--------+++',jvNo);
+       // console.log('jvNo--------+++',jvNo);
         const insertQuery = `
           INSERT INTO cdbm.fin_book_type 
             (fin_year, book_type, seg_code, activity_code, jv_no, description, end_date, add_user_id, add_date)
@@ -116,7 +116,7 @@ booktype_mast_routes.get('/ddl_segment_master', async (req, res) => {
           bookType, 
           segment, 
           activityCode, 
-          jvNo?jvNo:0, 
+          1, 
           bookTypeDesc, 
           endDate?endDate:null, 
           userId

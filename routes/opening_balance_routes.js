@@ -87,7 +87,7 @@ opening_balance_router.get('/searchOpenBal', async (req, res) => {
     let query = `select a.fin_year, to_char(a.bal_as_on_date, 'yyyy-MM-dd') bal_as_on_date, a.exc_cd, a.segment, a.activity_cd, ` +
         `${accountType === 'account' ? 'a.act_cd' : 'a.cb_act_cd'} , a.nor_depos, ` +
         `${accountType === 'account' ? 'b.account_name' : 'b.account_title'} account_name` +
-        `, a.open_bal_amt, a.drcr from cdbm.opening_balance a ` +
+        `, a.open_bal_amt, a.drcr from cdbm.fin_open_balance a ` +
         `join ${accountType === 'account' ? 'cdbm.fin_account_master b on b.act_cd = a.act_cd'
             : 'cdbm.fin_cash_bank_master b on b.cb_act_cd = a.cb_act_cd'} ` +
         `where a.fin_year = ${finYear} and ${accountType === 'account' ? 'a.act_cd is not null' : 'a.cb_act_cd is not null'} is not null `
@@ -271,7 +271,7 @@ opening_balance_router.get('/validate_account', async (req, res) => {
         for(let detail of details){
             const { account_type, act_cd, act_name, open_bal_amt, dr_cr } = detail;
             if(account_type === 'account'){
-                query = `select account_name from cdbm.opening_balance a join cdbm.fin_account_master b on a.act_cd = b.act_cd `+
+                query = `select account_name from cdbm.fin_open_balance a join cdbm.fin_account_master b on a.act_cd = b.act_cd `+
                 `where fin_year = $1 and a.act_cd = $2`;
                 const selectResult = await pool.query(query, [finYear, act_cd]);
                 if (selectResult.rows.length === 0) {
@@ -282,7 +282,7 @@ opening_balance_router.get('/validate_account', async (req, res) => {
                 return; 
             }
             else{
-                query = `select account_title from cdbm.opening_balance a join cdbm.fin_cash_bank_master b on a.cb_act_cd = b.cb_act_cd `+
+                query = `select account_title from cdbm.fin_open_balance a join cdbm.fin_cash_bank_master b on a.cb_act_cd = b.cb_act_cd `+
                 `where fin_year = $1 and a.cb_act_cd = $2;`;
                 const selectResult = await pool.query(query, [finYear, act_cd]);
                 if (selectResult.rows.length === 0) {
@@ -310,7 +310,7 @@ opening_balance_router.post('/save_open_bal', async (req, res) => {
     try {
         let query = '';
         if (editMode === 'N') {
-            query = `insert into cdbm.opening_balance (fin_year, bal_as_on_date, exc_cd, segment, activity_cd, nor_depos, ` +
+            query = `insert into cdbm.fin_open_balance (fin_year, bal_as_on_date, exc_cd, segment, activity_cd, nor_depos, ` +
                 `act_cd, cb_act_cd, open_bal_amt , drcr, n_add_user_id, d_add_date) ` +
                 `values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, clock_timestamp())`;
             for (let detail of details) {
@@ -322,7 +322,7 @@ opening_balance_router.post('/save_open_bal', async (req, res) => {
             }
         }
         else {
-            query = `update cdbm.opening_balance set bal_as_on_date = $1, drcr = $2, open_bal_amt = $3, n_upd_user_id = $4
+            query = `update cdbm.fin_open_balance set bal_as_on_date = $1, drcr = $2, open_bal_amt = $3, n_upd_user_id = $4
             , d_upd_date = clock_timestamp() where fin_year = $5 and exc_cd = $6
             and segment = $7 and activity_cd = $8 `;
             for (let detail of details) {

@@ -10,6 +10,7 @@ const multer = require('multer');
 const fs = require('fs');
 const fastcsv = require('fast-csv');
 const { v4: uuidv4 } = require('uuid');
+const nodemailer = require('nodemailer');
 
 const sqlquery='';
 const resulterr = [];
@@ -195,5 +196,194 @@ Main Contract Note Data will be printed from below api. The below API will retur
       res.status(500).send(error.message);
     }
   });
-  
+
+/// ******************************************************
+///     Start Contract Note Email Part 15/12/2025
+/// ******************************************************
+
+  //    send Mail-------->>>>>
+const app = express();
+
+// Ensure the upload directory exists
+const uploadDir = path.join(__dirname, 'uploads');
+
+const upload = multer({ dest: uploadDir });
+
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
+
+// Endpoint to send emails with attachments
+const PdfReader = require("pdfreader").PdfReader; // Import PdfReader
+//const fs = require('fs');
+
+// Helper function to extract email from PDF
+const extractEmailFromPDF = (filePath) => {
+  return new Promise((resolve, reject) => {
+      const pdfText = [];
+      const reader = new PdfReader();
+
+      reader.parseFileItems(filePath, (err, item) => {
+          if (err) {
+              console.error("Error reading PDF:", err);
+              reject(err);
+          } else if (!item) {
+              // End of file, process the collected text
+             // console.log("Extracted text:", pdfText);
+
+              const fullText = pdfText.join(" ");
+
+              // Regular expression to find an email address
+              const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g;
+              const matches = fullText.match(emailRegex);
+
+              if (matches && matches.length > 0) {
+                  // Take the first email found
+                  const email = matches[0];
+                  console.log("Extracted email:", email);
+                  resolve(email);
+              } else {
+                  reject(new Error("No email found in PDF."));
+              }
+          } else if (item.text) {
+              // Collect text from PDF
+              pdfText.push(item.text.trim());
+          }
+      });
+  });
+};
+
+sauda_report_router.post('/sendEmails_Contr_Notes', upload.array('files'), async (req, res) => {
+  try {
+      const files = req.files;
+
+      if (!files || files.length === 0) {
+          return res.status(400).json({ message: 'No files uploaded.' });
+      }
+      
+      // Configure the transporter
+      const transporter = nodemailer.createTransport({
+          service: 'Gmail',
+          auth: {
+              user: 'fahad.mohd@achyutlabs.com',
+              pass: 'bjgc twxi czkp pary', // Use an App Password if 2FA is enabled
+          },
+      });
+
+      // Process each file asynchronously with email extraction
+      const results = await Promise.allSettled(
+          files.map(async (file) => {
+              //console.log("Processing file:", file);
+              //console.log('file.originalname ==> ', file.originalname);
+              var user_Id = 1;
+              var lv_pdf_name = file.originalname;
+              var lv_valid_email = 'T';
+              var log_msg ='';
+              const lv_split_str =  lv_pdf_name.split('_');
+              //console.log('lv_split_str ==> ', lv_split_str[3]);
+
+              const result = await pool.query('select email_id from cdbm.clientmaster where client_cd = $1', [lv_split_str[3]]);
+
+              if (result.rows.length === 0) {
+                log_msg = ('Client not found in client master, ', lv_split_str[3]);
+                lv_valid_email = 'F';
+              }
+
+              const email_to = result.rows[0].email_id;
+
+              if (!email_to || email_to.length === 0){
+                log_msg = ('eMail not available for , ', lv_split_str[3]);
+                lv_valid_email = 'F';
+              }
+
+              // Extract email from the PDF
+              //temporarily by anis const email = await extractEmailFromPDF(file.path);
+              
+              // console.log("Extracted email:", email);
+           // console.log('email_to ==> ', email_to);
+
+            if (lv_valid_email === 'T') {
+              const attachments = {
+                filename: file.originalname,
+                path: file.path,
+              };
+              
+              const mailOptions = {
+                from: 'fahad.mohd@achyutlabs.com',
+                to: email_to, // Dynamic email from PDF
+                //to: 'anza.soft.tech@gmail.com',
+                subject: 'Contract Note No. ' + lv_split_str[2],
+                text: `Dear Sir/Madam, `+ String.fromCharCode(13) +
+                      ` ` + String.fromCharCode(13) +
+                      `   Please find attached the Constract Note for Settlement No. ` + lv_split_str[4] + String.fromCharCode(13) +
+                      + lv_split_str[4] + String.fromCharCode(13) +
+                      ` Thanks & Regards, ` + String.fromCharCode(13) +
+                      ' Sodhani Security Ltd.' + String.fromCharCode(13),
+                attachments,
+              };
+              //console.log('mailOptions ==> ', mailOptions);
+              // Send the email
+              try {
+                const info = await transporter.sendMail(mailOptions);
+                await pool.query(`insert into cdbm.email_log (document_name, file_name, client_cd, detail, email_id, status, sent_user_id, sent_datetime) 
+                values ($1, $2, $3, $4, $5, $6, $7, clock_timestamp()) `,
+                  ['Contract_Note', lv_pdf_name, lv_split_str[3], 'Contract Note sent to client', email_to, 'Sent', user_Id]);
+              }
+              catch (error) {
+                await pool.query(`insert into cdbm.email_log (document_name, file_name, client_cd, detail, email_id, status, sent_user_id, sent_datetime) 
+                  values ($1, $2, $3, $4, $5, $6, $7, clock_timestamp()) `,
+                 ['Contract_Note', lv_pdf_name, lv_split_str[3], (error).toString().substring(0, 99), email_to, 'Error', user_Id ]);
+              }
+            }
+            else {
+              await pool.query(`insert into cdbm.email_log (document_name, file_name, client_cd, detail, email_id, status, sent_user_id, sent_datetime) 
+                                  values ($1, $2, $3, $4, $5, $6, $7, clock_timestamp()) `,
+                                 ['Contract_Note', lv_pdf_name, log_msg, lv_split_str[3], email_to, 'Failed', user_Id ]);
+            }
+
+             // console.log("Email sent successfully:", info.response);
+
+              // Delete the file after sending the email
+              await fs.promises.unlink(file.path); // Use promises version for async handling
+              //console.log(`Deleted file: ${file.path}`);
+
+              return { status: 'fulfilled', file: file.originalname };
+          })
+      );
+
+      // Handle results and log errors for failed files
+      const errors = results
+          .filter((result) => result.status === 'rejected')
+          .map((error) => ({
+              file: error.reason.file,
+              message: error.reason.message,
+          }));
+
+      if (errors.length > 0) {
+          console.error("Some files failed to process:", errors);
+          await pool.query(`insert into cdbm.email_log (document_name, detail, status, sent_user_id, sent_datetime) 
+                                  values ($1, $2, $3, $4, clock_timestamp()) `,
+                                 ['Contract_Note',  (errors).toString().substring(0, 99),  'Other Error', user_Id ]);
+          return res.status(207).json({
+              message: 'Some emails failed to send.',
+              errors,
+          });
+      }
+
+      res.status(200).json({ message: 'All emails sent successfully!' });
+  } catch (error) {
+      console.error("Error in /sendEmails route:", error);
+      res.status(500).json({ message: 'Failed to send emails.', error: error.message });
+  }
+});
+
+/// ******************************************************
+///     End Contract Note Email Part 15/12/2025
+/// ******************************************************
+
+
   module.exports = sauda_report_router;
